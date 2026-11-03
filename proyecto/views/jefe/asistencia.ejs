@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto space-y-5 pb-8">
+<% if (vacio) { %>
+    <%- include('_vacio') %>
+<% } else { %>
+    <%- include('_nav') %>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+            <div class="p-4 sm:px-6 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-calendar-check text-amber-400"></i> Asistencia por estudiante</h2>
+                    <p class="text-[11px] text-slate-400"><%= asistencia.totalSesiones %> clases registradas &bull; Tardanzas cuentan como asistencia &bull; Mínimo <%= umbralAsistencia %>%</p>
+                </div>
+                <span class="text-xl font-black <%= asistencia.porcentajeCurso !== null && asistencia.porcentajeCurso < umbralAsistencia ? 'text-rose-400' : 'text-sky-400' %>"><%= asistencia.porcentajeCurso === null ? '-' : asistencia.porcentajeCurso + '%' %></span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-950/60">
+                            <th class="py-3 px-4">Estudiante</th>
+                            <th class="py-3 px-3 text-center">Presente</th>
+                            <th class="py-3 px-3 text-center">Tardanza</th>
+                            <th class="py-3 px-3 text-center">Ausente</th>
+                            <th class="py-3 px-3 min-w-[160px]">Asistencia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <% asistencia.filas.forEach((f) => { %>
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 px-4"><a href="/jefe/estudiante/<%= f.id_estudiante %>?curso=<%= curso.id_curso_periodo %>" class="font-semibold text-white hover:text-amber-300"><%= f.apellido %>, <%= f.nombre %></a></td>
+                                <td class="py-2.5 px-3 text-center text-emerald-300"><%= f.presentes %></td>
+                                <td class="py-2.5 px-3 text-center text-amber-300"><%= f.tardanzas %></td>
+                                <td class="py-2.5 px-3 text-center <%= f.ausentes > 0 ? 'text-rose-300' : 'text-slate-500' %>"><%= f.ausentes %></td>
+                                <td class="py-2.5 px-3">
+                                    <% if (f.porcentaje === null) { %>
+                                        <span class="text-slate-500">Sin registros</span>
+                                    <% } else { %>
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden"><div class="h-full rounded-full <%= f.alerta ? 'bg-rose-500' : 'bg-teal-500' %>" style="width: <%= f.porcentaje %>%"></div></div>
+                                            <span class="w-12 text-right font-black <%= f.alerta ? 'text-rose-400' : 'text-slate-200' %>"><%= f.porcentaje %>%</span>
+                                        </div>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-5 space-y-3 h-fit">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-book text-amber-400"></i> Por asignatura</h2>
+            <ul class="divide-y divide-slate-800">
+                <% asignaturas.forEach((a) => { %>
+                    <li class="py-2.5 space-y-1">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-semibold text-slate-100"><%= a.nombre %></span>
+                            <span class="font-black <%= a.porcentaje !== null && a.porcentaje < umbralAsistencia ? 'text-rose-400' : 'text-slate-200' %>"><%= a.porcentaje === null ? '-' : a.porcentaje + '%' %></span>
+                        </div>
+                        <p class="text-[10px] text-slate-400"><%= a.profesor %> &bull; <%= a.Presente %> pres. &bull; <%= a.Tardanza %> tard. &bull; <%= a.Ausente %> aus.</p>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+<% } %>
+</div>
+<%- include('../partials/footer') %>

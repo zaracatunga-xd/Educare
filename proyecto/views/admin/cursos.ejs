@@ -1,0 +1,401 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-6 p-4 md:p-6 max-w-7xl mx-auto min-h-screen text-slate-100">
+
+    <!-- Botón Volver al Panel -->
+    <div>
+        <a href="/admin" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-700/80 transition-all shadow-md">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver al Panel Admin</span>
+        </a>
+    </div>
+
+    <!-- Encabezado Principal -->
+    <div class="bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-emerald-700/40">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold tracking-wide">Gestión de Cursos y Carga Académica</h2>
+                <p class="text-emerald-200/70 text-xs mt-0.5">Administra los cursos, explora el catálogo curricular y asigna profesores a las asignaturas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    <% if (locals.error) { %>
+        <div class="bg-rose-900/50 border border-rose-700 text-rose-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2 shadow-lg">
+            <i class="fa-solid fa-circle-exclamation text-rose-400"></i> <%= error %>
+        </div>
+    <% } %>
+
+    <% if (locals.success) { %>
+        <div class="bg-emerald-900/50 border border-emerald-700 text-emerald-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2 shadow-lg">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i> <%= success %>
+        </div>
+    <% } %>
+
+    <!-- Pestañas de Navegación (Tabs) -->
+    <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-2">
+        <button onclick="cambiarPestana('tab-cursos')" id="btn-tab-cursos" class="pestana-btn active inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition border border-emerald-500/50 bg-emerald-600 text-white shadow-md">
+            <i class="fa-solid fa-school"></i>
+            <span>Cursos (<%= (locals.cursos && cursos.length) ? cursos.length : 0 %>)</span>
+        </button>
+
+        <button onclick="cambiarPestana('tab-ramos')" id="btn-tab-ramos" class="pestana-btn inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition border border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white">
+            <i class="fa-solid fa-book"></i>
+            <span>Catálogo de Asignaturas (<%= (locals.asignaturas && asignaturas.length) ? asignaturas.length : 0 %>)</span>
+        </button>
+
+        <button onclick="cambiarPestana('tab-carga')" id="btn-tab-carga" class="pestana-btn inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition border border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <span>Asignación Docente</span>
+        </button>
+    </div>
+
+    <!-- ==========================================
+         PESTAÑA 1: CURSOS
+         ========================================== -->
+    <div id="tab-cursos" class="pestana-contenido grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Listado de Cursos (2 Columnas) -->
+        <div class="lg:col-span-2 bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
+                <i class="fa-solid fa-list-check text-emerald-400"></i>
+                Listado de Cursos Registrados
+            </h3>
+
+            <% if (locals.cursos && cursos.length > 0) { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <% cursos.forEach(function(curso) { %>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 hover:border-slate-700 transition flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-bold text-white"><%= curso.nivel %> - Sección <%= curso.seccion %></p>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Jornada: <span class="text-slate-200"><%= curso.jornada %></span> | Sala: <span class="text-slate-200"><%= curso.sala %></span>
+                                </p>
+                            </div>
+                            <span class="text-[10px] uppercase px-2.5 py-1 rounded-lg font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+                                <%= curso.estado %>
+                            </span>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="bg-slate-950 p-8 rounded-xl text-center border border-slate-800 text-slate-400 text-xs">
+                    No hay cursos registrados en el sistema. Utiliza el formulario lateral para agregar el primero.
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Formulario Crear Curso (1 Columna) -->
+        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4 h-fit">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
+                <i class="fa-solid fa-plus-circle text-emerald-400"></i>
+                Crear Nuevo Curso
+            </h3>
+
+            <form action="/admin/cursos/crear-curso" method="POST" class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Nivel Escolar</label>
+                    <input type="text" name="nivel" placeholder="Ej: 1° Básico" required class="w-full bg-slate-950 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Sección / Letra</label>
+                    <input type="text" name="seccion" placeholder="Ej: A" required class="w-full bg-slate-950 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Jornada</label>
+                    <select name="jornada" class="w-full bg-slate-950 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="Mañana">Mañana</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Completa">Completa</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1">Ubicación / Sala</label>
+                    <input type="text" name="sala" placeholder="Ej: Sala 101" class="w-full bg-slate-950 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition shadow-lg mt-2">
+                    + Guardar Curso
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PESTAÑA 2: CATÁLOGO DE ASIGNATURAS
+         ========================================== -->
+    <div id="tab-ramos" class="pestana-contenido hidden">
+        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-emerald-400"></i>
+                    Catálogo Oficial de Asignaturas (Currículum MINEDUC)
+                </h3>
+                <span class="bg-emerald-950 text-emerald-400 border border-emerald-800/80 text-xs px-3 py-1 rounded-full font-bold">
+                    <%= (locals.asignaturas && asignaturas.length) ? asignaturas.length : 0 %> disponibles
+                </span>
+            </div>
+
+            <% if (locals.asignaturas && asignaturas.length > 0) { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    <% asignaturas.forEach(function(asig) { %>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-mono text-emerald-400 text-xs font-bold">[<%= asig.codigo %>]</span>
+                                    <span class="text-[10px] uppercase px-2 py-0.5 rounded font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+                                        <%= asig.estado %>
+                                    </span>
+                                </div>
+                                <h4 class="text-sm font-bold text-white"><%= asig.nombre %></h4>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed"><%= asig.descripcion || 'Sin descripción disponible.' %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="bg-slate-950 p-8 rounded-xl text-center border border-slate-800 text-slate-400 text-xs">
+                    No existen asignaturas catalogadas en la base de datos.
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PESTAÑA 3: ASIGNACIÓN DOCENTE
+         ========================================== -->
+    <div id="tab-carga" class="pestana-contenido hidden space-y-6">
+        
+        <!-- Formulario Superior de Asignación -->
+        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
+                <i class="fa-solid fa-link text-amber-400 text-xl"></i>
+                <div>
+                    <h3 class="text-base font-bold text-white">Vincular Docente a Curso y Ramo</h3>
+                    <p class="text-xs text-slate-400">Selecciona el curso, la asignatura y el profesor responsable de impartirla</p>
+                </div>
+            </div>
+
+            <form action="/admin/cursos/asignar-profesor" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-300 mb-1">1. Curso Target</label>
+                    <select name="id_curso" required class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="">-- Seleccionar Curso --</option>
+                        <% if (locals.cursos && cursos.length > 0) { %>
+                            <% cursos.forEach(function(c) { %>
+                                <option value="<%= c.id_curso %>"><%= c.nivel %> - Sección <%= c.seccion %></option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-300 mb-1">2. Asignatura / Ramo</label>
+                    <select id="selRamo" name="id_asignatura" required onchange="sincronizarAsignacion('ramo')" class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="">-- Seleccionar Ramo --</option>
+                        <% if (locals.asignaturas && asignaturas.length > 0) { %>
+                            <% asignaturas.forEach(function(a) { %>
+                                <option value="<%= a.id_asignatura %>"><%= a.nombre %> [<%= a.codigo %>]</option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-300 mb-1">3. Profesor Responsable</label>
+                    <select id="selProfesor" name="id_profesor" required onchange="sincronizarAsignacion('profesor')" class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="">-- Seleccionar Profesor --</option>
+                        <% if (locals.profesores && profesores.length > 0) { %>
+                            <% profesores.forEach(function(p) { %>
+                                <option value="<%= p.id_profesor %>" data-asignatura="<%= p.id_asignatura || '' %>" <%= p.id_asignatura ? '' : 'disabled' %>><%= p.nombre_completo %> (<%= p.especialidad %>)</option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check-double"></i>
+                        <span>Asignar Carga</span>
+                    </button>
+                </div>
+            </form>
+            <p class="text-[11px] text-slate-400">
+                <i class="fa-solid fa-circle-info mr-1"></i>
+                Al elegir un ramo solo aparecen los profesores que lo imparten, y al elegir un profesor el ramo se ajusta a su especialidad. Los docentes sin especialidad se configuran desde Gestión de Profesores.
+            </p>
+        </div>
+
+        <!-- Profesor Jefe por curso -->
+        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
+                <i class="fa-solid fa-user-tie text-amber-400 text-xl"></i>
+                <div>
+                    <h3 class="text-base font-bold text-white">Profesor Jefe de Curso</h3>
+                    <p class="text-xs text-slate-400">El profesor jefe puede ver las notas, la asistencia y los apoderados de todo su curso</p>
+                </div>
+            </div>
+
+            <form action="/admin/cursos/asignar-jefe" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-300 mb-1">Curso</label>
+                    <select name="id_curso" required class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="">-- Seleccionar Curso --</option>
+                        <% (locals.cursos || []).forEach(function(c) { %>
+                            <option value="<%= c.id_curso %>"><%= c.nivel %> - Sección <%= c.seccion %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-slate-300 mb-1">Profesor jefe</label>
+                    <select name="id_profesor" required class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="">-- Seleccionar Profesor --</option>
+                        <% (locals.profesores || []).forEach(function(p) { %>
+                            <option value="<%= p.id_profesor %>"><%= p.nombre_completo %> (<%= p.especialidad %>)</option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <span>Asignar Jefatura</span>
+                    </button>
+                </div>
+            </form>
+
+            <% if (locals.jefaturas && jefaturas.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                                <th class="p-3">Curso</th>
+                                <th class="p-3">Período</th>
+                                <th class="p-3">Profesor jefe</th>
+                                <th class="p-3 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <% jefaturas.forEach(function(j) { %>
+                                <tr>
+                                    <td class="p-3 text-white font-semibold"><%= j.nombre_curso %></td>
+                                    <td class="p-3 text-slate-300"><%= j.periodo %></td>
+                                    <td class="p-3 text-amber-300 font-semibold"><%= j.nombre_jefe %></td>
+                                    <td class="p-3 text-right">
+                                        <form action="/admin/cursos/quitar-jefe/<%= j.id_curso_periodo %>" method="POST" class="inline" onsubmit="return confirm('¿Retirar la jefatura de este curso?')">
+                                            <button type="submit" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-500/30 transition">Retirar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p class="text-xs text-slate-400">Aún no hay profesores jefe asignados.</p>
+            <% } %>
+            <p class="text-[11px] text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i>Al asignar la jefatura el usuario pasa al perfil "Profesor Jefe" (conserva todo lo del profesor). Debe volver a iniciar sesión para ver el cambio.</p>
+        </div>
+
+        <!-- Tabla de Asignaciones Existentes -->
+        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
+                <i class="fa-solid fa-table-list text-amber-400"></i>
+                Matriz de Carga Académica Vigente
+            </h3>
+
+            <% if (locals.asignaciones && asignaciones.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 bg-slate-950 text-slate-400 font-semibold uppercase">
+                                <th class="p-3.5">Curso</th>
+                                <th class="p-3.5">Asignatura</th>
+                                <th class="p-3.5">Docente Asignado</th>
+                                <th class="p-3.5 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60">
+                            <% asignaciones.forEach(function(asig) { %>
+                                <tr class="hover:bg-slate-800/40 transition-colors">
+                                    <td class="p-3.5 font-bold text-white"><%= asig.nombre_curso %></td>
+                                    <td class="p-3.5 text-emerald-400 font-semibold"><%= asig.nombre_asignatura %></td>
+                                    <td class="p-3.5 text-amber-300 font-semibold"><%= asig.nombre_profesor %></td>
+                                    <td class="p-3.5 text-center">
+                                        <form action="/admin/cursos/eliminar-asignacion/<%= asig.id_curso_asig %>" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas desvincular a este profesor?')">
+                                            <button type="submit" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/60 px-3 py-1.5 rounded-lg transition text-[11px] font-semibold">
+                                                <i class="fa-solid fa-unlink mr-1"></i> Desvincular
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="bg-slate-950 p-8 rounded-xl text-center border border-slate-800 text-slate-400 text-xs">
+                    Aún no se han asignado profesores a los ramos. Utiliza el formulario superior para crear la carga académica.
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT PARA CAMBIAR ENTRE PESTAÑAS -->
+<script>
+    function sincronizarAsignacion(origen) {
+        const selRamo = document.getElementById('selRamo');
+        const selProf = document.getElementById('selProfesor');
+        if (!selRamo || !selProf) return;
+
+        const opcionesProf = Array.from(selProf.options).filter(o => o.value);
+        const opcionesRamo = Array.from(selRamo.options).filter(o => o.value);
+        const profElegido = opcionesProf.find(o => o.value === selProf.value);
+
+        if (origen === 'profesor' && profElegido && profElegido.dataset.asignatura) {
+            selRamo.value = profElegido.dataset.asignatura;
+        }
+
+        const ramo = selRamo.value;
+        opcionesProf.forEach(o => {
+            const coincide = !ramo || o.dataset.asignatura === ramo;
+            o.hidden = !coincide;
+            o.disabled = !coincide || !o.dataset.asignatura;
+        });
+
+        const profActual = opcionesProf.find(o => o.value === selProf.value);
+        if (profActual && profActual.disabled) selProf.value = '';
+
+        const profFinal = opcionesProf.find(o => o.value === selProf.value);
+        const asignaturaProf = profFinal ? profFinal.dataset.asignatura : '';
+        opcionesRamo.forEach(o => {
+            const coincide = !asignaturaProf || o.value === asignaturaProf;
+            o.hidden = !coincide;
+            o.disabled = !coincide;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () { sincronizarAsignacion('ramo'); });
+
+    function cambiarPestana(idPestana) {
+        document.querySelectorAll('.pestana-contenido').forEach(el => el.classList.add('hidden'));
+
+        document.querySelectorAll('.pestana-btn').forEach(btn => {
+            btn.className = 'pestana-btn inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition border border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white';
+        });
+
+        const target = document.getElementById(idPestana);
+        if (target) target.classList.remove('hidden');
+
+        const btnActivo = document.getElementById('btn-' + idPestana);
+        if (btnActivo) {
+            btnActivo.className = 'pestana-btn active inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition border border-emerald-500/50 bg-emerald-600 text-white shadow-md';
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

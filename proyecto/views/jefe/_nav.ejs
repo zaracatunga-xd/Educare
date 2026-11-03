@@ -1,0 +1,48 @@
+<% const q = '?curso=' + curso.id_curso_periodo; %>
+<% const atras = typeof volver !== 'undefined' ? volver : (activo === 'panel' ? '/' : '/jefe' + q); %>
+<% const atrasTitulo = typeof volverTitulo !== 'undefined' ? volverTitulo : (activo === 'panel' ? 'Volver al inicio' : 'Volver al panel'); %>
+<div class="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-5 space-y-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="<%= atras %>" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="<%= atrasTitulo %>"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl shrink-0">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Profesor Jefe</p>
+                <h1 class="text-lg font-bold text-white"><%= curso.nombre_curso %></h1>
+                <p class="text-xs text-slate-400">Período <%= curso.anio %>-<%= curso.semestre %> &bull; Sala <%= curso.sala || 'S/N' %> &bull; Jornada <%= curso.jornada || '-' %></p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <% if (cursos.length > 1) { %>
+                <select onchange="window.location.href = window.location.pathname + '?curso=' + this.value"
+                        class="bg-slate-800 border border-slate-700 text-white text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-400">
+                    <% cursos.forEach((c) => { %>
+                        <option value="<%= c.id_curso_periodo %>" <%= c.id_curso_periodo === curso.id_curso_periodo ? 'selected' : '' %>><%= c.etiqueta %></option>
+                    <% }) %>
+                </select>
+            <% } %>
+            <a href="/jefe/informe-curso<%= q %>" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-file-arrow-down"></i><span>Informe del curso (PDF)</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-800">
+        <% [['panel', '/jefe', 'fa-gauge-high', 'Panel'], ['notas', '/jefe/notas', 'fa-graduation-cap', 'Notas'], ['asistencia', '/jefe/asistencia', 'fa-calendar-check', 'Asistencia'], ['apoderados', '/jefe/apoderados', 'fa-people-roof', 'Apoderados']].forEach(([clave, ruta, icono, texto]) => { %>
+            <a href="<%= ruta %><%= q %>"
+               class="px-3.5 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-2 <%= activo === clave ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800' %>">
+                <i class="fa-solid <%= icono %>"></i><span><%= texto %></span>
+            </a>
+        <% }) %>
+        <span class="hidden md:block flex-1"></span>
+        <a href="/profesor" class="px-3.5 py-2 rounded-xl text-xs font-bold border bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800 transition flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user"></i><span>Mis clases</span>
+        </a>
+        <a href="/profesor/atencionApo" class="px-3.5 py-2 rounded-xl text-xs font-bold border bg-slate-800/60 text-slate-300 border-slate-700/60 hover:bg-slate-800 transition flex items-center gap-2">
+            <i class="fa-solid fa-comments"></i><span>Chat y comunicados</span>
+        </a>
+    </nav>
+</div>

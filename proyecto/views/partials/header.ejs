@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Educare' %></title>
+
+    <!-- Script anti-parpadeo: carga el tema antes de renderizar la página -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 CDN -->  
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+      /* Aumento de tamaño de fuente a nivel global */
+      html.text-large {
+        font-size: 112.5% !important; /* ~18px */
+      }
+
+      html.text-xlarge {
+        font-size: 125% !important;   /* ~20px */
+      }
+    </style>
+
+    <script>
+      // Función para alternar el Modo Oscuro / Claro
+      function toggleDarkMode() {
+        const htmlElement = document.documentElement;
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        updateThemeText(newTheme);
+      }
+
+      function updateThemeText(theme) {
+        const themeLabel = document.getElementById('themeLabel');
+        const themeIcon = document.getElementById('themeIcon');
+        if (themeLabel) {
+          themeLabel.textContent = theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro';
+        }
+        if (themeIcon) {
+          themeIcon.className = theme === 'dark' 
+            ? 'fa-solid fa-sun text-amber-500 text-base w-5 text-center' 
+            : 'fa-solid fa-moon text-teal-600 text-base w-5 text-center';
+        }
+      }
+
+      var TEXT_STEPS = ['normal', 'large', 'xlarge'];
+      var TEXT_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
+
+      function applyTextSize(size) {
+        var el = document.documentElement;
+        el.classList.remove('text-large', 'text-xlarge');
+        if (size !== 'normal') el.classList.add('text-' + size);
+        document.querySelectorAll('.text-size-label').forEach(function (n) { n.textContent = TEXT_LABELS[size]; });
+        try { localStorage.setItem('textSize', size); } catch (e) {}
+      }
+
+      function toggleTextSize() {
+        var el = document.documentElement;
+        var current = el.classList.contains('text-xlarge') ? 'xlarge' : el.classList.contains('text-large') ? 'large' : 'normal';
+        applyTextSize(TEXT_STEPS[(TEXT_STEPS.indexOf(current) + 1) % TEXT_STEPS.length]);
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var saved = 'normal';
+        try { saved = localStorage.getItem('textSize') || 'normal'; } catch (e) {}
+        applyTextSize(TEXT_STEPS.indexOf(saved) > -1 ? saved : 'normal');
+      });
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        educare: {
+                            teal: '#0D9488',
+                            tealLight: '#CCFBF1',
+                            amber: '#F59E0B',
+                            amberLight: '#FEF3C7',
+                            softBlue: '#3B82F6',
+                            softBlueLight: '#DBEAFE',
+                            bg: '#F8FAFC',
+                            card: '#FFFFFF',
+                            text: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/educare-ui.css">
+    <script src="/js/ui.js"></script>
+    <script src="/js/date-rules.js"></script>
+</head>
+<%
+    const su = (typeof sessionUser !== 'undefined' && sessionUser) ? sessionUser : ((typeof user !== 'undefined' && user) ? user : null);
+    const rolTxt = su ? String(su.rol || '').toLowerCase().trim() : '';
+    const rutaActual = (typeof currentPath !== 'undefined' && currentPath) ? currentPath : '';
+    const MENUS = {
+        'administrador': [
+            ['Gestión', null],
+            ['/admin', 'Inicio', 'fa-house', true],
+            ['/admin/students', 'Estudiantes', 'fa-children'],
+            ['/admin/profesores', 'Profesores', 'fa-chalkboard-user'],
+            ['/admin/apoderadoA', 'Apoderados', 'fa-people-roof'],
+            ['Académico', null],
+            ['/admin/cursos', 'Cursos y asignaturas', 'fa-book-open'],
+            ['/admin/avisos', 'Avisos y circulares', 'fa-bullhorn'],
+            ['/admin/solicitudes', 'Solicitudes', 'fa-inbox']
+        ],
+        'profesor': [
+            ['Mi trabajo', null],
+            ['/profesor', 'Inicio', 'fa-house', true],
+            ['/profesor/estudiantes', 'Estudiantes', 'fa-children'],
+            ['/profesor/asistencia', 'Asistencia', 'fa-calendar-check'],
+            ['/profesor/calificaciones', 'Calificaciones', 'fa-graduation-cap'],
+            ['Comunicación', null],
+            ['/profesor/atencionApo', 'Atención a apoderados', 'fa-comments'],
+            ['/profesor/avisos', 'Avisos', 'fa-bullhorn'],
+            ['/profesor/solicitudes', 'Solicitudes', 'fa-inbox']
+        ],
+        'profesor jefe': [
+            ['Jefatura de curso', null],
+            ['/jefe', 'Panel de jefatura', 'fa-gauge-high', true],
+            ['/jefe/notas', 'Notas del curso', 'fa-graduation-cap'],
+            ['/jefe/asistencia', 'Asistencia', 'fa-calendar-check'],
+            ['/jefe/apoderados', 'Apoderados', 'fa-people-roof'],
+            ['Mis clases', null],
+            ['/profesor', 'Inicio docente', 'fa-chalkboard-user', true],
+            ['/profesor/estudiantes', 'Estudiantes', 'fa-children'],
+            ['/profesor/asistencia', 'Asistencia', 'fa-calendar-check'],
+            ['/profesor/calificaciones', 'Calificaciones', 'fa-graduation-cap'],
+            ['/profesor/atencionApo', 'Atención a apoderados', 'fa-comments'],
+            ['/profesor/avisos', 'Avisos', 'fa-bullhorn']
+        ],
+        'apoderado': [
+            ['Mi familia', null],
+            ['/apoderado', 'Inicio', 'fa-house', true],
+            ['/apoderado/notas-estu', 'Notas y asistencia', 'fa-graduation-cap'],
+            ['/apoderado/avisos', 'Avisos', 'fa-bullhorn'],
+            ['/apoderado/mensajes', 'Mensajes', 'fa-comments'],
+            ['/apoderado/agregar-pupilo', 'Agregar pupilo', 'fa-user-plus']
+        ]
+    };
+    const menu = MENUS[rolTxt] || (rolTxt === 'docente' ? MENUS['profesor'] : (rolTxt === 'admin' ? MENUS['administrador'] : null));
+    const iniciales = su ? ((String(su.nombre || '?')[0] || '?') + (String(su.apellido || '')[0] || '')).toUpperCase() : '';
+    const esActivo = (it) => it[3] ? rutaActual === it[0] : (rutaActual === it[0] || rutaActual.indexOf(it[0] + '/') === 0);
+    const conSidebar = !!(su && menu) && ['/', '/login', '/register'].indexOf(rutaActual) === -1;
+%>
+<body class="min-h-screen transition-colors duration-200">
+<% if (conSidebar) { %>
+<div class="app-shell">
+    <aside class="app-sidebar" id="appSidebar">
+        <div class="app-brand" onclick="goToHome()">
+            <div class="mark"><i class="fa-solid fa-hands-holding-child"></i></div>
+            <div>Educare<small>Escuela Especial Diferencial</small></div>
+        </div>
+        <% menu.forEach(function (it) { if (it[1] === null) { %>
+            <div class="nav-label"><%= it[0] %></div>
+        <% } else { %>
+            <a href="<%= it[0] %>" class="nav-link <%= esActivo(it) ? 'active' : '' %>">
+                <i class="fa-solid <%= it[2] %>"></i><span><%= it[1] %></span>
+            </a>
+        <% } }) %>
+        <div class="app-user">
+            <div class="av"><%= iniciales %></div>
+            <div style="min-width:0">
+                <b style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:capitalize"><%= su.nombre %> <%= su.apellido %></b>
+                <span style="text-transform:capitalize"><%= su.rol %></span>
+            </div>
+        </div>
+        <a href="/logout" class="nav-link nav-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Cerrar sesión</span></a>
+    </aside>
+    <div class="app-scrim" id="appScrim" onclick="toggleSidebar()"></div>
+
+    <div class="app-main">
+        <header class="app-topbar">
+            <div class="app-crumb">
+                <button type="button" class="icon-btn app-burger" onclick="toggleSidebar()" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+                <span>Educare</span><i class="fa-solid fa-chevron-right" style="font-size:.6rem;opacity:.5"></i><b style="text-transform:capitalize"><%= su.rol %></b>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem">
+                <button type="button" class="icon-btn" onclick="toggleDarkMode()" aria-label="Cambiar tema" title="Cambiar tema">
+                    <i class="fa-solid fa-moon theme-moon"></i><i class="fa-solid fa-sun theme-sun"></i>
+                </button>
+                <button type="button" class="icon-btn" onclick="toggleTextSize()" aria-label="Tamaño de fuente" title="Tamaño de fuente">
+                    <span class="text-size-label">A</span>
+                </button>
+            </div>
+        </header>
+        <main class="app-content">
+<% } else { %>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+    <header class="pub-bar">
+        <div>
+            <div class="app-brand" onclick="goToHome()">
+                <div class="mark"><i class="fa-solid fa-hands-holding-child"></i></div>
+                <div>Educare<small>Escuela Especial Diferencial</small></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem">
+                <button type="button" class="icon-btn" onclick="toggleDarkMode()" aria-label="Cambiar tema" title="Cambiar tema">
+                    <i class="fa-solid fa-moon theme-moon"></i><i class="fa-solid fa-sun theme-sun"></i>
+                </button>
+                <button type="button" class="icon-btn" onclick="toggleTextSize()" aria-label="Tamaño de fuente" title="Tamaño de fuente">
+                    <span class="text-size-label">A</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="pub-main">
+<% } %>
+<script>
+    function toggleSidebar() {
+        var s = document.getElementById('appSidebar'), c = document.getElementById('appScrim');
+        if (s) s.classList.toggle('open');
+        if (c) c.classList.toggle('open');
+    }
+</script>

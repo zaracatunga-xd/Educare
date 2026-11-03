@@ -1,0 +1,231 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-6 max-w-7xl mx-auto pb-6">
+
+    <!-- Encabezado con Botón Volver y Contadores de Estado -->
+    <div class="bg-slate-800/90 p-5 rounded-2xl shadow-xl border border-slate-700/70 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="/profesor" class="p-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-600/60" title="Volver al Panel">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-users text-teal-400"></i>
+                    Nómina de Alumnos Asignados
+                </h1>
+                <p class="text-xs text-slate-400">Gestión rápida de expedientes PIE, FUDEI y calificaciones por estudiante</p>
+            </div>
+        </div>
+
+        <!-- Indicadores rápidos -->
+        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+            <div class="px-3.5 py-1.5 bg-slate-900/80 rounded-xl border border-slate-700/60 text-center">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Alumnos</span>
+                <span class="text-sm font-extrabold text-teal-400" id="cntTotal"><%= typeof estudiantes !== 'undefined' ? estudiantes.length : 0 %></span>
+            </div>
+            <div class="px-3.5 py-1.5 bg-slate-900/80 rounded-xl border border-slate-700/60 text-center">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">FUDEI Pendientes</span>
+                <span class="text-sm font-extrabold text-amber-400" id="cntPendientes"><%= typeof fudeiPendientes !== 'undefined' ? fudeiPendientes : 0 %></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BARRA DE BÚSQUEDA Y FILTROS RÁPIDOS -->
+    <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/70 shadow-xl grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <!-- Búsqueda por Nombre o RUT -->
+        <div class="sm:col-span-6 relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            <input type="text" id="inputBuscarAlumno" placeholder="Buscar por Nombre, Apellido o RUT..."
+                   class="w-full bg-slate-900/90 text-slate-200 text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-400 placeholder-slate-500">
+        </div>
+
+        <!-- Filtro por Curso -->
+        <div class="sm:col-span-3">
+            <select id="selectFiltroCurso" class="w-full bg-slate-900/90 text-slate-200 text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-400">
+                <option value="TODOS">Todos los Cursos</option>
+                <% if (typeof cursos !== 'undefined' && cursos.length > 0) { %>
+                    <% cursos.forEach(c => { %>
+                        <option value="<%= c.nombre_curso %>"><%= c.nombre_curso %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+        </div>
+
+        <!-- Filtro por Estado FUDEI -->
+        <div class="sm:col-span-3">
+            <select id="selectFiltroFudei" class="w-full bg-slate-900/90 text-slate-200 text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-400">
+                <option value="TODOS">Todos los Estados FUDEI</option>
+                <option value="EN_PROCESO">Pendientes / En Proceso</option>
+                <option value="FINALIZADO">Finalizados</option>
+                <option value="SIN_FUDEI">Sin FUDEI</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- TABLA / LISTADO OPTIMIZADO DE ESTUDIANTES -->
+    <div class="bg-slate-800/90 rounded-2xl border border-slate-700/70 shadow-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-900/80 text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-700/70">
+                        <th class="py-3.5 px-4">Estudiante</th>
+                        <th class="py-3.5 px-4">Curso / Nivel</th>
+                        <th class="py-3.5 px-4">Diagnóstico / NEE</th>
+                        <th class="py-3.5 px-4">Estado FUDEI</th>
+                        <th class="py-3.5 px-4 text-center">Acciones Rápidas</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50 text-xs" id="tablaAlumnosBody">
+                    <% if (typeof estudiantes !== 'undefined' && estudiantes.length > 0) { %>
+                        <% estudiantes.forEach(est => { %>
+                            <tr class="item-alumno-row hover:bg-slate-700/40 transition"
+                                data-nombre="<%= (est.nombre + ' ' + est.apellido).toLowerCase() %>"
+                                data-rut="<%= est.rut.toLowerCase() %>"
+                                data-curso="<%= est.nombre_curso || '' %>"
+                                data-fudei="<%= est.fudei_estado || 'SIN_FUDEI' %>">
+                                
+                                <!-- Estudiante -->
+                                <td class="py-3.5 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-teal-500/20 text-teal-300 font-bold text-xs border border-teal-500/30 flex items-center justify-center shrink-0">
+                                            <%= est.nombre.charAt(0) %><%= est.apellido.charAt(0) %>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-white truncate"><%= est.nombre %> <%= est.apellido %></p>
+                                            <p class="text-[10px] text-slate-400">RUT: <%= est.rut %></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Curso -->
+                                <td class="py-3.5 px-4">
+                                    <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-200 border border-slate-700 font-semibold text-[11px]">
+                                        <%= est.nombre_curso || 'Sin Curso' %>
+                                    </span>
+                                </td>
+
+                                <!-- Diagnóstico / NEE -->
+                                <td class="py-3.5 px-4">
+                                    <% if (est.tipo_nee) { %>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                            <i class="fa-solid fa-brain text-[9px]"></i>
+                                            <%= est.tipo_nee %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="text-slate-500 text-[11px]">Sin registro NEE</span>
+                                    <% } %>
+                                </td>
+
+                                <!-- Estado FUDEI -->
+                                <td class="py-3.5 px-4">
+                                    <% if (est.fudei_estado === 'FINALIZADO') { %>
+                                        <span class="px-2.5 py-1 text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full inline-flex items-center gap-1">
+                                            <i class="fa-solid fa-circle-check text-[9px]"></i> Finalizado
+                                        </span>
+                                    <% } else if (est.fudei_estado === 'EN_PROCESO') { %>
+                                        <span class="px-2.5 py-1 text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full inline-flex items-center gap-1 animate-pulse">
+                                            <i class="fa-solid fa-clock text-[9px]"></i> En Proceso
+                                        </span>
+                                    <% } else { %>
+                                        <span class="px-2.5 py-1 text-[10px] font-bold bg-slate-700 text-slate-400 border border-slate-600 rounded-full">
+                                            Sin FUDEI
+                                        </span>
+                                    <% } %>
+                                </td>
+
+                                <!-- Acciones Rápidas -->
+                                <td class="py-3.5 px-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <!-- Expediente FUDEI -->
+                                        <a href="/profesor/fudei/<%= est.id_estudiante %>" 
+                                           class="px-2.5 py-1.5 bg-teal-600/20 hover:bg-teal-600 text-teal-300 hover:text-white rounded-lg text-[11px] font-semibold transition border border-teal-500/30 flex items-center gap-1.5"
+                                           title="Editar FUDEI">
+                                            <i class="fa-solid fa-file-signature"></i>
+                                            <span class="hidden md:inline">Editar FUDEI</span>
+                                        </a>
+
+                                        <a href="/profesor/informe-notas/<%= est.id_estudiante %>"
+                                           class="px-2.5 py-1.5 bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white rounded-lg text-[11px] font-semibold transition border border-sky-500/30 flex items-center gap-1.5"
+                                           title="Descargar informe de notas">
+                                            <i class="fa-solid fa-file-arrow-down"></i>
+                                            <span class="hidden md:inline">Informe</span>
+                                        </a>
+
+                                        <!-- Notas -->
+                                        <a href="/profesor/calificaciones?estudiante=<%= est.id_estudiante %>" 
+                                           class="px-2.5 py-1.5 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 rounded-lg text-[11px] font-semibold transition border border-amber-500/30 flex items-center gap-1.5"
+                                           title="Ingresar Calificaciones">
+                                            <i class="fa-solid fa-graduation-cap"></i>
+                                            <span class="hidden md:inline">Notas</span>
+                                        </a>
+
+                                        <!-- Mensajes -->
+                                        <a href="/profesor/mensajes?estudiante=<%= est.id_estudiante %>" 
+                                           class="px-2.5 py-1.5 bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white rounded-lg text-[11px] font-semibold transition border border-sky-500/30 flex items-center gap-1.5"
+                                           title="Contactar Apoderado">
+                                            <i class="fa-solid fa-comments"></i>
+                                            <span class="hidden md:inline">Chat</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr id="rowSinAlumnos">
+                            <td colspan="5" class="py-12 text-center text-slate-500 space-y-2">
+                                <i class="fa-solid fa-users-slash text-3xl text-slate-600 block"></i>
+                                <p class="text-xs">No hay alumnos asignados a su cuenta docente.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT DE FILTRADO RÁPIDO CLIENTE -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const inputBuscar = document.getElementById('inputBuscarAlumno');
+        const selectCurso = document.getElementById('selectFiltroCurso');
+        const selectFudei = document.getElementById('selectFiltroFudei');
+        const rows = document.querySelectorAll('.item-alumno-row');
+
+        function filtrarTabla() {
+            const q = inputBuscar ? inputBuscar.value.toLowerCase().trim() : '';
+            const cursoSel = selectCurso ? selectCurso.value : 'TODOS';
+            const fudeiSel = selectFudei ? selectFudei.value : 'TODOS';
+
+            let visibles = 0;
+
+            rows.forEach(row => {
+                const nombre = row.getAttribute('data-nombre') || '';
+                const rut = row.getAttribute('data-rut') || '';
+                const curso = row.getAttribute('data-curso') || '';
+                const fudei = row.getAttribute('data-fudei') || '';
+
+                const coincideTexto = !q || nombre.includes(q) || rut.includes(q);
+                const coincideCurso = (cursoSel === 'TODOS') || (curso === cursoSel);
+                const coincideFudei = (fudeiSel === 'TODOS') || (fudei === fudeiSel);
+
+                if (coincideTexto && coincideCurso && coincideFudei) {
+                    row.style.display = '';
+                    visibles++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const cntElem = document.getElementById('cntTotal');
+            if (cntElem) cntElem.innerText = visibles;
+        }
+
+        if (inputBuscar) inputBuscar.addEventListener('input', filtrarTabla);
+        if (selectCurso) selectCurso.addEventListener('change', filtrarTabla);
+        if (selectFudei) selectFudei.addEventListener('change', filtrarTabla);
+    });
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,97 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-6 p-4 md:p-6 max-w-7xl mx-auto min-h-screen text-slate-100">
+
+    <!-- Botón Volver al Panel del Profesor -->
+    <div>
+        <a href="/profesor" class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white rounded-xl text-xs font-bold border border-slate-700/80 shadow-md transition backdrop-blur-md">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver al Panel</span>
+        </a>
+    </div>
+
+    <!-- Encabezado Principal -->
+    <div class="bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-emerald-700/40">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl border border-amber-500/30">
+                <i class="fa-solid fa-user-clock"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold tracking-wide">Solicitudes de Matrícula Pendientes</h2>
+                <p class="text-emerald-200/70 text-xs mt-0.5">Aprueba o rechaza los nuevos pupilos registrados para tus cursos</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    <% if (locals.error) { %>
+        <div class="bg-rose-900/50 border border-rose-700 text-rose-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2 shadow-lg">
+            <i class="fa-solid fa-circle-exclamation text-rose-400"></i> <%= error %>
+        </div>
+    <% } %>
+
+    <% if (locals.success) { %>
+        <div class="bg-emerald-900/50 border border-emerald-700 text-emerald-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2 shadow-lg">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i> <%= success %>
+        </div>
+    <% } %>
+
+    <!-- Listado de Solicitudes -->
+    <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-emerald-400"></i>
+                Solicitudes Recibidas
+            </h3>
+            <span class="bg-amber-950 text-amber-400 border border-amber-800/80 text-xs px-3 py-1 rounded-full font-bold">
+                <%= (locals.solicitudes && solicitudes.length) ? solicitudes.length : 0 %> pendientes
+            </span>
+        </div>
+
+        <% if (locals.solicitudes && solicitudes.length > 0) { %>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950 text-slate-400 font-semibold uppercase">
+                            <th class="p-3.5">Estudiante</th>
+                            <th class="p-3.5">RUT</th>
+                            <th class="p-3.5">Curso Solicitado</th>
+                            <th class="p-3.5">Apoderado</th>
+                            <th class="p-3.5 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60">
+                        <% solicitudes.forEach(function(s) { %>
+                            <tr class="hover:bg-slate-800/40 transition-colors">
+                                <td class="p-3.5 font-bold text-white"><%= s.nombre_estudiante %></td>
+                                <td class="p-3.5 font-mono text-slate-400"><%= s.rut_estudiante %></td>
+                                <td class="p-3.5 text-emerald-400 font-semibold"><%= s.nivel %> - <%= s.seccion %></td>
+                                <td class="p-3.5 text-slate-300"><%= s.nombre_apoderado %> <span class="text-slate-500">(<%= s.parentesco %>)</span></td>
+                                <td class="p-3.5 text-center flex justify-center gap-2">
+                                    <form action="/profesor/solicitudes/aceptar/<%= s.id_inscripcion %>" method="POST" class="inline">
+                                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-md">
+                                            ✓ Aceptar
+                                        </button>
+                                    </form>
+
+                                    <form action="/profesor/solicitudes/rechazar/<%= s.id_inscripcion %>" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas rechazar esta solicitud?')">
+                                        <button type="submit" class="bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800/60 font-bold px-3 py-1.5 rounded-lg transition">
+                                            ✕ Rechazar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="bg-slate-950 p-8 rounded-xl text-center border border-slate-800 text-slate-400 text-xs">
+                No tienes solicitudes de matricula pendientes por revisar.
+            </div>
+        <% } %>
+    </div>
+
+</div>
+
+<%- include('../partials/footer') %>

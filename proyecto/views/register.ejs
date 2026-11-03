@@ -1,0 +1,336 @@
+<%- include('partials/header') %>
+
+<div class="min-h-[calc(100vh-140px)] flex items-center justify-center py-10 px-4 relative overflow-hidden">
+    <!-- Luces ambientales de fondo -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-teal-500/10 blur-[140px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 bg-slate-900/80 backdrop-blur-xl border border-slate-700/70 rounded-3xl shadow-2xl overflow-hidden relative z-10">
+        
+        <!-- PANEL LATERAL CON FOTO CÁLIDA Y AMIGABLE -->
+        <div class="lg:col-span-5 relative hidden lg:flex flex-col justify-between p-8 overflow-hidden min-h-[600px] dark-island">
+            <!-- Foto Amigable: Niño leyendo / aprendizaje interactivo -->
+            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop" 
+                 alt="Comunidad Educare Registro" 
+                 class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-900/50"></div>
+
+            <!-- Contenido sobre la imagen -->
+            <div class="relative z-10">
+                <a href="/" class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-900/85 hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-bold border border-slate-700/80 transition backdrop-blur-md">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
+                </a>
+            </div>
+
+            <div class="relative z-10 space-y-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-[11px] font-extrabold uppercase tracking-wider border border-teal-500/30 backdrop-blur-md">
+                    <i class="fa-solid fa-user-plus"></i> Registro de Usuario
+                </span>
+                <h3 class="text-2xl font-extrabold text-white leading-snug">Súmate a la Comunidad Educare</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Solicita tu cuenta como apoderado, docente o administrador para vincularte a tu curso y acompañar el proceso educativo.
+                </p>
+
+                <div class="space-y-2 pt-2 text-xs text-slate-300">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-chalkboard-user text-teal-400"></i>
+                        <span>Docentes: Registro de especialidad e informes</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-people-roof text-teal-400"></i>
+                        <span>Apoderados: Seguimiento transparente del pupilo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <div class="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-center">
+            
+            <!-- Botón Volver para Pantallas Móviles -->
+            <div class="mb-4 lg:hidden">
+                <a href="/" class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold border border-slate-700 transition">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
+                </a>
+            </div>
+
+            <div class="text-center sm:text-left mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-500/20 text-teal-400 mb-3 border border-teal-500/30 shadow-lg shadow-teal-500/10">
+                    <i class="fa-solid fa-user-plus text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-white">Registro de Usuario</h2>
+                <p class="text-xs text-slate-400 mt-1">Completa tus datos para crear una cuenta</p>
+            </div>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl mb-5 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-rose-400 text-sm"></i>
+                    <span><%= error %></span>
+                </div>
+            <% } %>
+
+            <form id="registerForm" action="/register" method="POST" class="space-y-4" novalidate>
+                
+                <div>
+                    <label for="rut" class="block text-xs font-bold text-slate-300 mb-1">RUT *</label>
+                    <input type="text" id="rut" name="rut" required maxlength="12"
+                           value="<%= (typeof values !== 'undefined' && values && values.rut) ? values.rut : '' %>"
+                           placeholder="ej: 12345678-9"
+                           class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="nombre" class="block text-xs font-bold text-slate-300 mb-1">Nombre *</label>
+                        <input type="text" id="nombre" name="nombre" required maxlength="50"
+                               value="<%= (typeof values !== 'undefined' && values && values.nombre) ? values.nombre : '' %>"
+                               class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                    </div>
+                    <div>
+                        <label for="apellido" class="block text-xs font-bold text-slate-300 mb-1">Apellido *</label>
+                        <input type="text" id="apellido" name="apellido" required maxlength="50"
+                               value="<%= (typeof values !== 'undefined' && values && values.apellido) ? values.apellido : '' %>"
+                               class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="fecha_nacimiento" class="block text-xs font-bold text-slate-300 mb-1">Fecha de nacimiento</label>
+                        <input type="date" data-date-rule="birth-adult" id="fecha_nacimiento" name="fecha_nacimiento"
+                               value="<%= (typeof values !== 'undefined' && values && values.fecha_nacimiento) ? values.fecha_nacimiento : '' %>"
+                               class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                    </div>
+                    <div>
+                        <label for="genero" class="block text-xs font-bold text-slate-300 mb-1">Género</label>
+                        <select id="genero" name="genero"
+                                class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                            <option value="">-- Seleccione --</option>
+                            <option value="Femenino" <%= (typeof values !== 'undefined' && values && values.genero === 'Femenino') ? 'selected' : '' %>>Femenino</option>
+                            <option value="Masculino" <%= (typeof values !== 'undefined' && values && values.genero === 'Masculino') ? 'selected' : '' %>>Masculino</option>
+                            <option value="Otro" <%= (typeof values !== 'undefined' && values && values.genero === 'Otro') ? 'selected' : '' %>>Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="correo" class="block text-xs font-bold text-slate-300 mb-1">Correo (usuario de login) *</label>
+                    <input type="email" id="correo" name="correo" required maxlength="100"
+                           value="<%= (typeof values !== 'undefined' && values && values.correo) ? values.correo : '' %>"
+                           placeholder="ej: nombre@educare.cl"
+                           class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                </div>
+
+                <div>
+                    <label for="id_rol" class="block text-xs font-bold text-slate-300 mb-1">Rol *</label>
+                    <select id="id_rol" name="id_rol" required
+                            class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                        <option value="">-- Seleccione --</option>
+                        <% if (typeof roles !== 'undefined' && roles && roles.length > 0) { %>
+                            <% roles.forEach(function(rol) { %>
+                                <% const nom = rol.nombre.toLowerCase(); %>
+                                <% if (!nom.includes('estudiante') && !nom.includes('alumno')) { %>
+                                    <option value="<%= rol.id_rol %>" <%= (typeof values !== 'undefined' && values && String(values.id_rol) === String(rol.id_rol)) ? 'selected' : '' %>><%= rol.nombre %></option>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <!-- CAMPO ASIGNATURA PARA DOCENTES -->
+                <div id="campoEspecialidad" class="hidden relative transition-all duration-300">
+                    <label class="block text-xs font-bold text-teal-400 mb-1">
+                        <i class="fa-solid fa-book-open mr-1"></i> Asignatura / Especialidad Docente *
+                    </label>
+                    
+                    <input type="hidden" id="id_asignatura" name="id_asignatura" value="<%= (typeof values !== 'undefined' && values && values.id_asignatura) ? values.id_asignatura : '' %>">
+
+                    <button type="button" id="btnCustomSelect" 
+                            class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-teal-500/40 text-white text-xs flex items-center justify-between hover:border-teal-400 focus:outline-none focus:border-teal-400 transition cursor-pointer">
+                        <span id="labelCustomSelect" class="truncate font-medium text-slate-200">-- Seleccione la materia que imparte --</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-teal-400 ml-2"></i>
+                    </button>
+
+                    <div id="listaCustomSelect" class="hidden absolute left-0 right-0 mt-1 bg-slate-950 border border-teal-500/40 rounded-xl shadow-2xl z-50 max-h-52 overflow-y-auto divide-y divide-slate-800 custom-scrollbar">
+                        <div class="opcion-asig p-3 hover:bg-teal-600 hover:text-white text-slate-400 text-xs cursor-pointer transition flex items-center gap-2 group" 
+                             data-value="" data-text="-- Seleccione la materia que imparte --">
+                            <i class="fa-solid fa-minus text-xs text-slate-500 group-hover:text-white"></i>
+                            <span>-- Seleccione la materia que imparte --</span>
+                        </div>
+                        <% if (typeof asignaturas !== 'undefined' && asignaturas && asignaturas.length > 0) { %>
+                            <% asignaturas.forEach(function(asig) { %>
+                                <div class="opcion-asig p-3 hover:bg-teal-600 hover:text-white text-slate-200 text-xs cursor-pointer transition flex items-center gap-2 group" 
+                                     data-value="<%= asig.id_asignatura %>" 
+                                     data-text="<%= asig.nombre %>">
+                                    <i class="fa-solid fa-book text-xs text-teal-400 group-hover:text-white"></i>
+                                    <span class="font-medium"><%= asig.nombre %></span>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="password" class="block text-xs font-bold text-slate-300 mb-1">Contraseña *</label>
+                        <input type="password" id="password" name="password" required minlength="6" maxlength="16"
+                               placeholder="Entre 6 y 16 caracteres"
+                               class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                    </div>
+
+                    <div>
+                        <label for="confirm_password" class="block text-xs font-bold text-slate-300 mb-1">Confirmar contraseña *</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required minlength="6" maxlength="16"
+                               placeholder="Repita la contraseña"
+                               class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-xs transition">
+                    </div>
+                </div>
+
+                <p id="formError" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs"></p>
+
+                <button type="submit"
+                        class="w-full py-3.5 px-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-teal-500/20 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 text-sm cursor-pointer mt-2">
+                    <i class="fa-solid fa-user-plus"></i> Registrarse
+                </button>
+            </form>
+
+            <div class="mt-6 pt-5 border-t border-slate-800 text-center">
+                <p class="text-xs text-slate-400">¿Ya tienes cuenta? <a href="/login" class="text-teal-400 font-bold hover:underline ml-1">Inicia sesión</a></p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<% if (typeof success !== 'undefined' && success) { %>
+<script>
+    Swal.fire({
+        title: '¡Solicitud Enviada!',
+        text: '<%= success %>',
+        icon: 'success',
+        confirmButtonText: 'Ir al Login',
+        confirmButtonColor: '#14b8a6'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/login';
+        }
+    });
+</script>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<script>
+    Swal.fire({
+        title: 'Error en el Registro',
+        text: '<%= error %>',
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#f43f5e'
+    });
+</script>
+<% } %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var selectRol = document.getElementById('id_rol');
+    var campoEspecialidad = document.getElementById('campoEspecialidad');
+    var inputAsignatura = document.getElementById('id_asignatura');
+    var btnCustomSelect = document.getElementById('btnCustomSelect');
+    var listaCustomSelect = document.getElementById('listaCustomSelect');
+    var labelCustomSelect = document.getElementById('labelCustomSelect');
+
+    function toggleEspecialidad() {
+        var selectedOption = selectRol.options[selectRol.selectedIndex];
+        var textoRol = selectedOption ? selectedOption.text.toLowerCase() : '';
+
+        if (textoRol.includes('profesor') || textoRol.includes('docente')) {
+            campoEspecialidad.classList.remove('hidden');
+        } else {
+            campoEspecialidad.classList.add('hidden');
+            if (inputAsignatura) inputAsignatura.value = '';
+            if (labelCustomSelect) labelCustomSelect.innerText = '-- Seleccione la materia que imparte --';
+        }
+    }
+
+    if (selectRol) {
+        selectRol.addEventListener('change', toggleEspecialidad);
+        toggleEspecialidad();
+    }
+
+    if (btnCustomSelect && listaCustomSelect) {
+        btnCustomSelect.addEventListener('click', function (e) {
+            e.stopPropagation();
+            listaCustomSelect.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('.opcion-asig').forEach(function (opcion) {
+            opcion.addEventListener('click', function () {
+                var val = opcion.getAttribute('data-value');
+                var text = opcion.getAttribute('data-text');
+
+                inputAsignatura.value = val;
+                labelCustomSelect.innerText = text;
+                listaCustomSelect.classList.add('hidden');
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!campoEspecialidad.contains(e.target)) {
+                listaCustomSelect.classList.add('hidden');
+            }
+        });
+    }
+
+    var form = document.getElementById('registerForm');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            var errorEl = document.getElementById('formError');
+            errorEl.classList.add('hidden');
+            errorEl.textContent = '';
+
+            var required = ['rut', 'nombre', 'apellido', 'correo', 'id_rol', 'password', 'confirm_password'];
+            var labels = { rut: 'RUT', nombre: 'Nombre', apellido: 'Apellido', correo: 'Correo', id_rol: 'Rol', password: 'Contraseña', confirm_password: 'Confirmar contraseña' };
+            
+            for (var i = 0; i < required.length; i++) {
+                var el = document.getElementById(required[i]);
+                if (!el.value || !el.value.trim()) {
+                    e.preventDefault();
+                    errorEl.textContent = 'El campo "' + labels[required[i]] + '" es obligatorio.';
+                    errorEl.classList.remove('hidden');
+                    el.focus();
+                    return;
+                }
+            }
+
+            var selectedOption = selectRol.options[selectRol.selectedIndex];
+            if (selectedOption && (selectedOption.text.toLowerCase().includes('profesor') || selectedOption.text.toLowerCase().includes('docente'))) {
+                if (!inputAsignatura.value) {
+                    e.preventDefault();
+                    errorEl.textContent = 'Por favor, selecciona una asignatura / especialidad para el rol de Profesor.';
+                    errorEl.classList.remove('hidden');
+                    btnCustomSelect.focus();
+                    return;
+                }
+            }
+
+            var password = document.getElementById('password').value;
+            var confirm = document.getElementById('confirm_password').value;
+            if (password.length < 6 || password.length > 16) {
+                e.preventDefault();
+                errorEl.textContent = 'La contraseña debe tener entre 6 y 16 caracteres.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (password !== confirm) {
+                e.preventDefault();
+                errorEl.textContent = 'La contraseña y la confirmación no coinciden.';
+                errorEl.classList.remove('hidden');
+                document.getElementById('confirm_password').focus();
+            }
+        });
+    }
+});
+</script>
+
+<%- include('partials/footer') %>

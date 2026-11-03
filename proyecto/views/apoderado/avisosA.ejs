@@ -1,0 +1,290 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-6 max-w-7xl mx-auto pb-6">
+
+    <!-- Encabezado con Botón Volver -->
+    <div class="bg-slate-800/90 p-5 rounded-2xl shadow-xl border border-slate-700/70 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="/apoderado" class="p-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-600/60" title="Volver al Portal Apoderado">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-inbox text-amber-400"></i>
+                    Comunicados Oficiales de la Escuela
+                </h1>
+                <p class="text-xs text-slate-400">Canal institucional de información y avisos para apoderados</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-full text-xs font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-envelope-open-text text-amber-400"></i>
+                <span id="contadorNoleidos"><%= typeof avisos !== 'undefined' ? avisos.length : 0 %></span> Sin revisar
+            </span>
+        </div>
+    </div>
+
+    <!-- Estructura Estilo Gmail -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[580px]">
+
+        <!-- LISTA DE MENSAJES (5 COLS) -->
+        <div class="lg:col-span-5 bg-slate-800/90 rounded-2xl border border-slate-700/70 shadow-xl overflow-hidden flex flex-col">
+            
+            <div class="p-3.5 bg-slate-900/80 border-b border-slate-700/70 flex items-center justify-between gap-2">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="inputBuscarAviso" placeholder="Buscar en la bandeja..." 
+                           class="w-full bg-slate-800 text-slate-200 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="divide-y divide-slate-700/50 overflow-y-auto max-h-[520px] flex-1" id="listaAvisosContainer">
+                <% if (typeof avisos !== 'undefined' && avisos.length > 0) { %>
+                    <% avisos.forEach((a, index) => { %>
+                        <div data-index="<%= index %>" data-id="<%= a.id_aviso %>"
+                             class="item-aviso p-4 hover:bg-slate-700/40 cursor-pointer transition flex flex-col gap-1.5 <%= index === 0 ? 'bg-slate-700/50 border-l-4 border-amber-400' : '' %>"
+                             data-titulo="<%= a.titulo.toLowerCase() %>"
+                             data-contenido="<%= a.contenido.toLowerCase() %>">
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-white truncate max-w-[180px]">
+                                    <%= a.autor_nombre %> <%= a.autor_apellido %>
+                                </span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="badge-estado-visto text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+                                        Pendiente
+                                    </span>
+                                    <span class="text-[10px] text-slate-400">
+                                        <%= new Date(a.fecha_publicacion).toLocaleDateString('es-CL') %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-2">
+                                <h3 class="text-xs font-semibold text-amber-300 truncate"><%= a.titulo %></h3>
+                                
+                                <!-- BADGES COLOREADOS POR PRIORIDAD -->
+                                <% if (a.prioridad === 'Alta') { %>
+                                    <span class="px-1.5 py-0.5 text-[9px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded shrink-0">🔴 Urgente</span>
+                                <% } else if (a.prioridad === 'Baja') { %>
+                                    <span class="px-1.5 py-0.5 text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded shrink-0">🟢 Baja</span>
+                                <% } else { %>
+                                    <span class="px-1.5 py-0.5 text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded shrink-0">🟡 Normal</span>
+                                <% } %>
+                            </div>
+
+                            <p class="text-[11px] text-slate-400 line-clamp-2">
+                                <%= a.contenido %>
+                            </p>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="p-12 text-center text-slate-500 text-xs space-y-2">
+                        <i class="fa-solid fa-inbox text-3xl text-slate-600 block"></i>
+                        <p>No tienes comunicados recibidos en tu bandeja.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- VISOR DE COMUNICADOS (7 COLS) -->
+        <div class="lg:col-span-7 bg-slate-800/90 rounded-2xl border border-slate-700/70 shadow-xl p-6 flex flex-col justify-between">
+            <% if (typeof avisos !== 'undefined' && avisos.length > 0) { %>
+                <div id="visorAvisoContainer" class="space-y-6">
+                    <div class="pb-4 border-b border-slate-700/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span id="visorPrioridad" class="px-2 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider">
+                                    <%= avisos[0].prioridad %>
+                                </span>
+                                <span id="visorFecha" class="text-xs text-slate-400">
+                                    <%= new Date(avisos[0].fecha_publicacion).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                </span>
+                            </div>
+                            <h2 id="visorTitulo" class="text-xl font-bold text-white tracking-tight"><%= avisos[0].titulo %></h2>
+                        </div>
+
+                        <!-- Botón para Marcar Visto -->
+                        <button type="button" id="btnMarcarVisto" class="px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 border shrink-0 bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30 cursor-pointer">
+                            <i class="fa-solid fa-check-double text-xs"></i>
+                            <span id="txtBtnMarcarVisto">Marcar como Visto</span>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/60">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-sm border border-amber-500/30">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <div>
+                            <p id="visorAutor" class="text-xs font-bold text-white"><%= avisos[0].autor_nombre %> <%= avisos[0].autor_apellido %></p>
+                            <p class="text-[10px] text-slate-400">Dirección Institucional Educare</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/50 p-5 rounded-2xl border border-slate-800 text-slate-200 text-xs sm:text-sm leading-relaxed space-y-3 min-h-[200px]" id="visorContenido">
+                        <%= avisos[0].contenido %>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="h-full flex flex-col items-center justify-center text-center p-12 text-slate-500 space-y-3">
+                    <i class="fa-solid fa-envelope-open text-4xl text-slate-600"></i>
+                    <p class="text-xs">Selecciona un mensaje de la lista para leer su contenido.</p>
+                </div>
+            <% } %>
+
+            <div class="pt-4 border-t border-slate-700/60 text-right text-[10px] text-slate-500">
+                Sistema Oficial de Comunicaciones Internas - Educare
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script id="avisosData" type="application/json">
+    <%- JSON.stringify(typeof avisos !== 'undefined' ? avisos : []).replace(/</g, '\\u003c') %>
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dataElem = document.getElementById('avisosData');
+        const avisos = dataElem ? JSON.parse(dataElem.textContent || '[]') : [];
+        let indexSel = 0;
+
+        function getVistos() {
+            return JSON.parse(localStorage.getItem('avisos_vistos_apoderado') || '[]');
+        }
+
+        function saveVisto(idAviso, estaVisto) {
+            let vistos = getVistos();
+            if (estaVisto) {
+                if (!vistos.includes(idAviso)) vistos.push(idAviso);
+            } else {
+                vistos = vistos.filter(id => id !== idAviso);
+            }
+            localStorage.setItem('avisos_vistos_apoderado', JSON.stringify(vistos));
+        }
+
+        function actualizarUIItem(index) {
+            const a = avisos[index];
+            if (!a) return;
+            const vistos = getVistos();
+            const esVisto = vistos.includes(a.id_aviso);
+
+            const item = document.querySelector(`.item-aviso[data-index="${index}"]`);
+            if (item) {
+                const badge = item.querySelector('.badge-estado-visto');
+                if (badge) {
+                    if (esVisto) {
+                        badge.className = 'badge-estado-visto text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-slate-700 text-slate-400 border border-slate-600';
+                        badge.innerText = 'Visto';
+                    } else {
+                        badge.className = 'badge-estado-visto text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse';
+                        badge.innerText = 'Pendiente';
+                    }
+                }
+            }
+
+            if (index === indexSel) {
+                const btn = document.getElementById('btnMarcarVisto');
+                if (btn) {
+                    if (esVisto) {
+                        btn.className = 'px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 border shrink-0 bg-slate-700/60 text-slate-300 border-slate-600 hover:bg-slate-700 cursor-pointer';
+                        btn.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i><span>Visto (Marcar pendiente)</span>';
+                    } else {
+                        btn.className = 'px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 border shrink-0 bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30 cursor-pointer';
+                        btn.innerHTML = '<i class="fa-solid fa-check-double text-xs"></i><span>Marcar como Visto</span>';
+                    }
+                }
+            }
+
+            const pendientes = avisos.filter(av => !vistos.includes(av.id_aviso)).length;
+            const elemCont = document.getElementById('contadorNoleidos');
+            if (elemCont) elemCont.innerText = pendientes;
+        }
+
+        function aplicarEstiloPrioridad(prioridad, elem) {
+            if (!elem) return;
+            if (prioridad === 'Alta') {
+                elem.className = 'px-2 py-0.5 text-[10px] font-bold rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase tracking-wider';
+                elem.innerText = '🔴 Urgente';
+            } else if (prioridad === 'Baja') {
+                elem.className = 'px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase tracking-wider';
+                elem.innerText = '🟢 Baja';
+            } else {
+                elem.className = 'px-2 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider';
+                elem.innerText = '🟡 Normal';
+            }
+        }
+
+        avisos.forEach((_, i) => actualizarUIItem(i));
+
+        const listaContainer = document.getElementById('listaAvisosContainer');
+        if (listaContainer) {
+            listaContainer.addEventListener('click', (e) => {
+                const item = e.target.closest('.item-aviso');
+                if (!item) return;
+
+                const idx = parseInt(item.getAttribute('data-index'), 10);
+                const a = avisos[idx];
+                if (!a) return;
+
+                indexSel = idx;
+
+                document.querySelectorAll('.item-aviso').forEach(el => {
+                    el.classList.remove('bg-slate-700/50', 'border-l-4', 'border-amber-400');
+                });
+                item.classList.add('bg-slate-700/50', 'border-l-4', 'border-amber-400');
+
+                const vTitulo = document.getElementById('visorTitulo');
+                const vContenido = document.getElementById('visorContenido');
+                const vAutor = document.getElementById('visorAutor');
+                const vFecha = document.getElementById('visorFecha');
+                const vPrioridad = document.getElementById('visorPrioridad');
+
+                if (vTitulo) vTitulo.innerText = a.titulo;
+                if (vContenido) vContenido.innerText = a.contenido;
+                if (vAutor) vAutor.innerText = `${a.autor_nombre} ${a.autor_apellido || ''}`;
+                if (vFecha) {
+                    vFecha.innerText = new Date(a.fecha_publicacion).toLocaleDateString('es-CL', {
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    });
+                }
+
+                aplicarEstiloPrioridad(a.prioridad, vPrioridad);
+                actualizarUIItem(idx);
+            });
+        }
+
+        const btnMarcar = document.getElementById('btnMarcarVisto');
+        if (btnMarcar) {
+            btnMarcar.addEventListener('click', () => {
+                const a = avisos[indexSel];
+                if (!a) return;
+
+                const vistos = getVistos();
+                const yaVisto = vistos.includes(a.id_aviso);
+                saveVisto(a.id_aviso, !yaVisto);
+                actualizarUIItem(indexSel);
+            });
+        }
+
+        const inputBuscar = document.getElementById('inputBuscarAviso');
+        if (inputBuscar) {
+            inputBuscar.addEventListener('input', () => {
+                const q = inputBuscar.value.toLowerCase();
+                document.querySelectorAll('.item-aviso').forEach(el => {
+                    const tit = el.getAttribute('data-titulo') || '';
+                    const con = el.getAttribute('data-contenido') || '';
+                    el.style.display = (tit.includes(q) || con.includes(q)) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        if (avisos.length > 0) {
+            aplicarEstiloPrioridad(avisos[0].prioridad, document.getElementById('visorPrioridad'));
+        }
+    });
+</script>
+
+<%- include('../partials/footer') %>

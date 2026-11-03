@@ -1,0 +1,403 @@
+<%- include('partials/header') %>
+
+<div class="max-w-5xl mx-auto space-y-6">
+
+    <!-- Navegación y Botón Volver -->
+    <div>
+        <a href="/apoderado" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-teal-700 bg-white border border-slate-200 px-4 py-2.5 rounded-xl shadow-sm transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver a la lista de estudiantes</span>
+        </a>
+    </div>
+
+    <!-- Alertas de Error -->
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation text-base"></i>
+            <span><%= error %></span>
+        </div>
+    <% } %>
+
+    <form action="/apoderado/editar-pupilo/<%= pupilo ? pupilo.id_estudiante : '' %>" method="POST" class="space-y-6">
+        
+        <!-- SECCIÓN 1: DATOS PERSONALES -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex items-center gap-4 pb-4 border-b border-slate-100">
+                <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-user-pen"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-800">Datos Personales del Estudiante</h1>
+                    <p class="text-xs text-slate-500">Información básica y de filiación del alumno.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">RUT</label>
+                    <input type="text" name="rut" value="<%= (pupilo && pupilo.rut) ? pupilo.rut : '' %>" required placeholder="12345678-9" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Nombres</label>
+                    <input type="text" name="nombre" value="<%= (pupilo && pupilo.nombre) ? pupilo.nombre : '' %>" required placeholder="Nombres" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Apellidos</label>
+                    <input type="text" name="apellido" value="<%= (pupilo && pupilo.apellido) ? pupilo.apellido : '' %>" required placeholder="Apellidos" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Fecha de Nacimiento</label>
+                    <input type="date" data-date-rule="birth-student" name="fecha_nacimiento" value="<%= (pupilo && pupilo.fecha_nacimiento_fmt) ? pupilo.fecha_nacimiento_fmt : '' %>" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Género</label>
+                    <select name="genero" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                        <option value="Masculino" <%= (pupilo && pupilo.genero === 'Masculino') ? 'selected' : '' %>>Masculino</option>
+                        <option value="Femenino" <%= (pupilo && pupilo.genero === 'Femenino') ? 'selected' : '' %>>Femenino</option>
+                        <option value="Otro" <%= (pupilo && pupilo.genero === 'Otro') ? 'selected' : '' %>>Otro</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Parentesco</label>
+                    <input type="text" name="parentesco" value="<%= (pupilo && pupilo.parentesco) ? pupilo.parentesco : '' %>" placeholder="Ej: Hijo(a)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: DATOS DEL FUDEI -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex items-center gap-4 pb-4 border-b border-slate-100">
+                <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-file-medical"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Formulario FUDEI & Diagnóstico NEE</h2>
+                    <p class="text-xs text-slate-500">Clasificación de necesidades educativas especiales y períodos.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="sm:col-span-1">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Diagnóstico / NEE</label>
+                    <select name="id_tipo_nee" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                        <% if (typeof tiposNee !== 'undefined' && tiposNee) { %>
+                            <% tiposNee.forEach(t => { %>
+                                <option value="<%= t.id_tipo_nee %>" <%= (typeof fudei !== 'undefined' && fudei && fudei.id_tipo_nee === t.id_tipo_nee) ? 'selected' : '' %>>
+                                    [<%= t.clasificacion %>] <%= t.nombre %>
+                                </option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Fecha Evaluación</label>
+                    <input type="date" data-date-rule="past" name="fecha_evaluacion" value="<%= (typeof fudei !== 'undefined' && fudei && fudei.fecha_evaluacion_fmt) ? fudei.fecha_evaluacion_fmt : '' %>" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Fecha Vencimiento</label>
+                    <input type="date" data-date-rule="after" data-date-after="fecha_evaluacion" name="fecha_vencimiento" value="<%= (typeof fudei !== 'undefined' && fudei && fudei.fecha_vencimiento_fmt) ? fudei.fecha_vencimiento_fmt : '' %>" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition">
+                </div>
+            </div>
+
+            <!-- Síntesis Multidimensional -->
+            <div class="pt-4 border-t border-slate-100 space-y-4">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Síntesis Integrativa de Evaluación</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Síntesis de Salud</label>
+                        <textarea name="sintesis_salud" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"><%= (typeof sintesis !== 'undefined' && sintesis) ? (sintesis.sintesis_salud || '') : '' %></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Síntesis Psicoeducativa</label>
+                        <textarea name="sintesis_psicoeducativa" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"><%= (typeof sintesis !== 'undefined' && sintesis) ? (sintesis.sintesis_psicoeducativa || '') : '' %></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Síntesis Escolar</label>
+                        <textarea name="sintesis_escolar" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"><%= (typeof sintesis !== 'undefined' && sintesis) ? (sintesis.sintesis_escolar || '') : '' %></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Síntesis Social y Familiar</label>
+                        <textarea name="sintesis_social_familiar" rows="3" class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition"><%= (typeof sintesis !== 'undefined' && sintesis) ? (sintesis.sintesis_social_familiar || '') : '' %></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: EQUIPO EVALUADOR -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">Equipo Evaluador Profesional</h2>
+                        <p class="text-xs text-slate-500">Especialistas a cargo de las evaluaciones.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="addEvaluadorRow()" class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-plus text-[10px]"></i>
+                    <span>Añadir Evaluador</span>
+                </button>
+            </div>
+
+            <div class="hidden sm:grid grid-cols-12 gap-3 px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <div class="col-span-4">Nombre Completo</div>
+                <div class="col-span-3">Rol / Profesión</div>
+                <div class="col-span-2">Registro Prof.</div>
+                <div class="col-span-2">Fecha Eval.</div>
+                <div class="col-span-1 text-center">Acción</div>
+            </div>
+
+            <div id="evaluadores-container" class="space-y-3">
+                <% if (typeof evaluadores !== 'undefined' && evaluadores && evaluadores.length > 0) { %>
+                    <% evaluadores.forEach((e) => { %>
+                        <div class="grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 items-center">
+                            <div class="col-span-12 sm:col-span-4">
+                                <input type="text" name="evaluador_nombre" value="<%= e.nombre_completo || '' %>" placeholder="Nombre completo" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-12 sm:col-span-3">
+                                <input type="text" name="evaluador_rol" value="<%= e.rol_profesional || '' %>" placeholder="Rol / Profesión" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-12 sm:col-span-2">
+                                <input type="text" name="evaluador_registro" value="<%= e.registro_profesional || '' %>" placeholder="Registro Prof." class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-10 sm:col-span-2">
+                                <input type="date" data-date-rule="past" name="evaluador_fecha" value="<%= e.fecha_evaluacion_fmt || '' %>" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-2 sm:col-span-1 flex justify-center">
+                                <button type="button" onclick="this.closest('.grid').remove()" class="p-2 text-slate-400 hover:text-red-600 text-xs transition" title="Eliminar">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 items-center">
+                        <div class="col-span-12 sm:col-span-4">
+                            <input type="text" name="evaluador_nombre" placeholder="Nombre completo" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-12 sm:col-span-3">
+                            <input type="text" name="evaluador_rol" placeholder="Rol / Profesión" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-12 sm:col-span-2">
+                            <input type="text" name="evaluador_registro" placeholder="Registro Prof." class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-10 sm:col-span-2">
+                            <input type="date" data-date-rule="past" name="evaluador_fecha" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1 flex justify-center">
+                            <button type="button" onclick="this.closest('.grid').remove()" class="p-2 text-slate-400 hover:text-red-600 text-xs transition" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: APOYOS Y RECURSOS -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-hand-holding-hand"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">Apoyos Requeridos</h2>
+                        <p class="text-xs text-slate-500">Áreas de intervención pedagógicas y técnicas.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="addApoyoRow()" class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-plus text-[10px]"></i>
+                    <span>Añadir Apoyo</span>
+                </button>
+            </div>
+
+            <div class="hidden sm:grid grid-cols-12 gap-3 px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <div class="col-span-4">Área de Apoyo</div>
+                <div class="col-span-4">Descripción Intervención</div>
+                <div class="col-span-3">Hrs. Semanales</div>
+                <div class="col-span-1 text-center">Acción</div>
+            </div>
+
+            <div id="apoyos-container" class="space-y-3">
+                <% if (typeof apoyos !== 'undefined' && apoyos && apoyos.length > 0) { %>
+                    <% apoyos.forEach((a) => { %>
+                        <div class="grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 items-center">
+                            <div class="col-span-12 sm:col-span-4">
+                                <input type="text" name="apoyo_area" value="<%= a.area_apoyo || '' %>" placeholder="Ej: Psicopedagogía" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-12 sm:col-span-4">
+                                <input type="text" name="apoyo_descripcion" value="<%= a.descripcion_intervencion || '' %>" placeholder="Descripción de intervención" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-10 sm:col-span-3">
+                                <input type="number" step="0.5" name="apoyo_horas" value="<%= a.frecuencia_semanal_hrs || '1.0' %>" placeholder="Horas" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                            </div>
+                            <div class="col-span-2 sm:col-span-1 flex justify-center">
+                                <button type="button" onclick="this.closest('.grid').remove()" class="p-2 text-slate-400 hover:text-red-600 text-xs transition" title="Eliminar">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 items-center">
+                        <div class="col-span-12 sm:col-span-4">
+                            <input type="text" name="apoyo_area" placeholder="Ej: Psicopedagogía" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-12 sm:col-span-4">
+                            <input type="text" name="apoyo_descripcion" placeholder="Descripción de intervención" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-10 sm:col-span-3">
+                            <input type="number" step="0.5" name="apoyo_horas" value="1.0" placeholder="Horas" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1 flex justify-center">
+                            <button type="button" onclick="this.closest('.grid').remove()" class="p-2 text-slate-400 hover:text-red-600 text-xs transition" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="flex items-center justify-end gap-3 pt-4">
+            <a href="/apoderado" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
+                Cancelar
+            </a>
+            <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl text-xs transition flex items-center gap-2 cursor-pointer shadow-sm">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Guardar Cambios</span>
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- MODAL / POP-UP DE ÉXITO -->
+<div id="modalExitoModificacion" 
+     data-has-mensaje="<%= (typeof locals !== 'undefined' && locals.mensaje) ? 'true' : 'false' %>" 
+     class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 opacity-0 transition-opacity duration-300">
+    
+    <div id="modalContentBox" class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center space-y-6 transform scale-90 opacity-0 transition-all duration-300 ease-out">
+        
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-sm">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div class="space-y-2">
+            <h3 class="text-xl font-bold text-slate-800">¡Estudiante Actualizado!</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">
+                Los datos del pupilo y la información de su FUDEI se modificaron correctamente en el sistema.
+            </p>
+        </div>
+
+        <button type="button" 
+                onclick="cerrarModalExito()" 
+                class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-check text-sm"></i>
+            <span>Aceptar</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isUpdated = urlParams.get('updated') === 'true';
+
+        const modal = document.getElementById('modalExitoModificacion');
+        const hasMensaje = modal ? modal.getAttribute('data-has-mensaje') === 'true' : false;
+
+        if (isUpdated || hasMensaje) {
+            abrirModalExito();
+            if (isUpdated) {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        }
+    });
+
+    function abrirModalExito() {
+        const modal = document.getElementById('modalExitoModificacion');
+        const box = document.getElementById('modalContentBox');
+
+        if (modal && box) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-90', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 20);
+        }
+    }
+
+    function cerrarModalExito() {
+        // Redirige de inmediato al hacer clic en Aceptar sin esperar animaciones
+        window.location.href = '/apoderado';
+    }
+
+    function addEvaluadorRow() {
+        const container = document.getElementById('evaluadores-container');
+        const div = document.createElement('div');
+        div.className = 'grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 items-center';
+        div.innerHTML = `
+            <div class="col-span-12 sm:col-span-4">
+                <input type="text" name="evaluador_nombre" placeholder="Nombre completo" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-12 sm:col-span-3">
+                <input type="text" name="evaluador_rol" placeholder="Rol / Profesión" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-12 sm:col-span-2">
+                <input type="text" name="evaluador_registro" placeholder="Registro Prof." class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-10 sm:col-span-2">
+                <input type="date" data-date-rule="past" name="evaluador_fecha" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-2 sm:col-span-1 flex justify-center">
+                <button type="button" onclick="this.closest('.grid').remove()" class="p-2 text-slate-400 hover:text-red-600 text-xs transition" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function addApoyoRow() {
+        const container = document.getElementById('apoyos-container');
+        const div = document.createElement('div');
+        div.className = 'grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 items-center';
+        div.innerHTML = `
+            <div class="col-span-12 sm:col-span-4">
+                <input type="text" name="apoyo_area" placeholder="Ej: Psicopedagogía" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-12 sm:col-span-4">
+                <input type="text" name="apoyo_descripcion" placeholder="Descripción de intervención" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-10 sm:col-span-3">
+                <input type="number" step="0.5" name="apoyo_horas" value="1.0" placeholder="Horas" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="col-span-2 sm:col-span-1 flex justify-center">
+                <button type="button" onclick="this.closest('.grid').remove()" class="p-2 text-slate-400 hover:text-red-600 text-xs transition" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+</script>
+
+<%- include('partials/footer') %>

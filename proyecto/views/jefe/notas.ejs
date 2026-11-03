@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto space-y-5 pb-8">
+<% if (vacio) { %>
+    <%- include('_vacio') %>
+<% } else { %>
+    <%- include('_nav') %>
+
+    <% const colorNota = (n) => n === null ? 'text-slate-500' : (n >= 4 ? 'text-slate-100' : 'text-rose-400 font-black'); %>
+
+    <div class="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+        <div class="p-4 sm:px-6 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-amber-400"></i> Notas de todo el curso</h2>
+                <p class="text-[11px] text-slate-400">Promedio ponderado por asignatura. Haz clic en un estudiante para ver su ficha completa.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <input type="text" id="buscarEstudiante" placeholder="Buscar estudiante..." class="bg-slate-800 border border-slate-700 text-white text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-400">
+                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer"><input type="checkbox" id="soloRiesgo" class="accent-amber-500"> Solo en riesgo</label>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" id="tablaNotas">
+                <thead>
+                    <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-950/60">
+                        <th class="py-3 px-4 min-w-[190px]">Estudiante</th>
+                        <% notas.columnas.forEach((c) => { %>
+                            <th class="py-3 px-2 text-center min-w-[78px]" title="<%= c.nombre %> — <%= c.profesor %>">
+                                <span class="block truncate max-w-[84px] mx-auto"><%= c.nombre %></span>
+                                <span class="block text-[9px] font-normal normal-case text-slate-500"><%= c.profesor %></span>
+                            </th>
+                        <% }) %>
+                        <th class="py-3 px-3 text-center">Promedio</th>
+                        <th class="py-3 px-3 text-center">PDF</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    <% notas.filas.forEach((f) => { %>
+                        <tr class="fila-estudiante hover:bg-slate-800/40 transition" data-nombre="<%= f.nombre_completo.toLowerCase() %>" data-riesgo="<%= (f.general !== null && (f.general < 4 || f.reprobadas >= 2)) ? '1' : '0' %>">
+                            <td class="py-2.5 px-4">
+                                <a href="/jefe/estudiante/<%= f.id_estudiante %>?curso=<%= curso.id_curso_periodo %>" class="font-semibold text-white hover:text-amber-300"><%= f.apellido %>, <%= f.nombre %></a>
+                                <% if (f.nee) { %><span class="block text-[10px] text-indigo-300"><%= f.nee_clasificacion %> &bull; <%= f.nee %></span><% } %>
+                            </td>
+                            <% f.promedios.forEach((p) => { %>
+                                <td class="py-2.5 px-2 text-center <%= colorNota(p) %>"><%= p === null ? '-' : p.toFixed(1) %></td>
+                            <% }) %>
+                            <td class="py-2.5 px-3 text-center">
+                                <span class="inline-block min-w-[44px] px-2 py-1 rounded-lg font-black <%= f.general === null ? 'text-slate-500 bg-slate-800' : (f.general >= 4 ? 'text-teal-300 bg-teal-500/10 border border-teal-500/30' : 'text-rose-300 bg-rose-500/10 border border-rose-500/30') %>"><%= f.general === null ? '-' : f.general.toFixed(1) %></span>
+                            </td>
+                            <td class="py-2.5 px-3 text-center">
+                                <a href="/jefe/informe/<%= f.id_estudiante %>?curso=<%= curso.id_curso_periodo %>" class="inline-flex px-2 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white border border-sky-500/30 transition" title="Descargar informe de notas"><i class="fa-solid fa-file-arrow-down"></i></a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+                <tfoot>
+                    <tr class="bg-slate-950/60 font-bold text-slate-200">
+                        <td class="py-3 px-4 uppercase text-[10px] tracking-wider text-slate-400">Promedio del curso</td>
+                        <% notas.columnas.forEach((c) => { %>
+                            <td class="py-3 px-2 text-center <%= c.promedio !== null && c.promedio < 4 ? 'text-rose-400' : 'text-teal-300' %>"><%= c.promedio === null ? '-' : c.promedio.toFixed(1) %></td>
+                        <% }) %>
+                        <td class="py-3 px-3 text-center text-amber-300 font-black"><%= notas.promedioCurso === null ? '-' : notas.promedioCurso.toFixed(1) %></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+<% } %>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const buscador = document.getElementById('buscarEstudiante');
+        const riesgo = document.getElementById('soloRiesgo');
+        if (!buscador) return;
+        const filtrar = () => {
+            const q = buscador.value.toLowerCase().trim();
+            document.querySelectorAll('.fila-estudiante').forEach((fila) => {
+                const coincide = fila.getAttribute('data-nombre').includes(q) && (!riesgo.checked || fila.getAttribute('data-riesgo') === '1');
+                fila.style.display = coincide ? '' : 'none';
+            });
+        };
+        buscador.addEventListener('input', filtrar);
+        riesgo.addEventListener('change', filtrar);
+    });
+</script>
+<%- include('../partials/footer') %>

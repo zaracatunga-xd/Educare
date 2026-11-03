@@ -1,0 +1,309 @@
+<%- include('../partials/header') %>
+
+<%
+    const estadoFudei = fudei ? fudei.estado : 'SIN_FUDEI';
+    const finalizado = estadoFudei === 'FINALIZADO';
+    const campo = 'w-full bg-slate-900 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-400 disabled:opacity-60';
+    const area = 'w-full bg-slate-900 text-slate-200 text-xs p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-400 disabled:opacity-60';
+    const etiqueta = 'block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1';
+    const neet = tiposNee.filter((t) => t.clasificacion === 'NEET');
+    const neep = tiposNee.filter((t) => t.clasificacion === 'NEEP');
+%>
+
+<div class="space-y-5 max-w-5xl mx-auto pb-8">
+
+    <!-- ENCABEZADO -->
+    <div class="bg-slate-800/90 p-5 rounded-2xl shadow-xl border border-slate-700/70 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="/profesor/estudiantes" class="p-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-600/60 shrink-0" title="Volver a Alumnos">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-file-signature text-teal-400"></i>
+                    Expediente FUDEI
+                </h1>
+                <p class="text-xs text-slate-400"><%= estudiante.nombre %> <%= estudiante.apellido %> • RUT <%= estudiante.rut %> • <%= estudiante.nombre_curso || 'Sin curso' %></p>
+            </div>
+        </div>
+
+        <% if (finalizado) { %>
+            <span class="px-3 py-1.5 text-[11px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1.5 self-start md:self-auto">
+                <i class="fa-solid fa-lock text-[10px]"></i> Finalizado
+            </span>
+        <% } else if (fudei) { %>
+            <span class="px-3 py-1.5 text-[11px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1.5 self-start md:self-auto">
+                <i class="fa-solid fa-pen text-[10px]"></i> En proceso
+            </span>
+        <% } else { %>
+            <span class="px-3 py-1.5 text-[11px] font-bold bg-slate-700/60 text-slate-300 border border-slate-600/60 rounded-full flex items-center gap-1.5 self-start md:self-auto">
+                <i class="fa-regular fa-file text-[10px]"></i> Sin FUDEI
+            </span>
+        <% } %>
+    </div>
+
+    <% if (finalizado) { %>
+        <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs flex items-start gap-2">
+            <i class="fa-solid fa-circle-info mt-0.5"></i>
+            <span>Este FUDEI está finalizado y, según la normativa, ya no admite modificaciones. Puedes consultarlo en modo lectura.</span>
+        </div>
+    <% } else if (!fudei) { %>
+        <div class="p-4 bg-sky-500/10 border border-sky-500/30 rounded-xl text-sky-300 text-xs flex items-start gap-2">
+            <i class="fa-solid fa-circle-info mt-0.5"></i>
+            <span>Este estudiante aún no tiene un expediente FUDEI. Completa el formulario y guarda para crearlo.</span>
+        </div>
+    <% } %>
+
+    <form id="formFudei" action="/profesor/fudei/<%= estudiante.id_estudiante %>" method="POST" class="space-y-5">
+        <fieldset <%= finalizado ? 'disabled' : '' %> class="space-y-5 min-w-0">
+
+            <!-- DATOS DE LA EVALUACIÓN -->
+            <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700/70 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-list text-teal-400"></i>
+                    Datos de la Evaluación
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="<%= etiqueta %>">Tipo de NEE</label>
+                        <select name="id_tipo_nee" required class="<%= campo %>">
+                            <option value="">-- Seleccionar --</option>
+                            <% if (neet.length > 0) { %>
+                                <optgroup label="NEE Transitorias (NEET)">
+                                    <% neet.forEach((t) => { %>
+                                        <option value="<%= t.id_tipo_nee %>" <%= fudei && fudei.id_tipo_nee === t.id_tipo_nee ? 'selected' : '' %>><%= t.nombre %></option>
+                                    <% }) %>
+                                </optgroup>
+                            <% } %>
+                            <% if (neep.length > 0) { %>
+                                <optgroup label="NEE Permanentes (NEEP)">
+                                    <% neep.forEach((t) => { %>
+                                        <option value="<%= t.id_tipo_nee %>" <%= fudei && fudei.id_tipo_nee === t.id_tipo_nee ? 'selected' : '' %>><%= t.nombre %></option>
+                                    <% }) %>
+                                </optgroup>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="<%= etiqueta %>">Fecha de Evaluación</label>
+                        <input type="date" name="fecha_evaluacion" required data-date-rule="past"
+                               value="<%= fudei ? fudei.fecha_evaluacion_fmt : hoy %>" class="<%= campo %>">
+                    </div>
+
+                    <div>
+                        <label class="<%= etiqueta %>">Fecha de Vencimiento</label>
+                        <input type="date" name="fecha_vencimiento" data-date-rule="after" data-date-after="fecha_evaluacion"
+                               value="<%= fudei ? fudei.fecha_vencimiento_fmt : '' %>" class="<%= campo %>">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SÍNTESIS -->
+            <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700/70 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-notes-medical text-teal-400"></i>
+                    Síntesis de la Evaluación
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="<%= etiqueta %>">Síntesis de Salud</label>
+                        <textarea name="sintesis_salud" rows="4" class="<%= area %>"><%= sintesis.sintesis_salud || '' %></textarea>
+                    </div>
+                    <div>
+                        <label class="<%= etiqueta %>">Síntesis Psicoeducativa</label>
+                        <textarea name="sintesis_psicoeducativa" rows="4" class="<%= area %>"><%= sintesis.sintesis_psicoeducativa || '' %></textarea>
+                    </div>
+                    <div>
+                        <label class="<%= etiqueta %>">Síntesis Escolar</label>
+                        <textarea name="sintesis_escolar" rows="4" class="<%= area %>"><%= sintesis.sintesis_escolar || '' %></textarea>
+                    </div>
+                    <div>
+                        <label class="<%= etiqueta %>">Síntesis Social y Familiar</label>
+                        <textarea name="sintesis_social_familiar" rows="4" class="<%= area %>"><%= sintesis.sintesis_social_familiar || '' %></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EQUIPO EVALUADOR -->
+            <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700/70 shadow-xl space-y-4">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-doctor text-teal-400"></i>
+                        Equipo Evaluador
+                    </h2>
+                    <% if (!finalizado) { %>
+                        <button type="button" id="btnAgregarEvaluador" class="px-3 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                            <span>Añadir Evaluador</span>
+                        </button>
+                    <% } %>
+                </div>
+
+                <div class="hidden md:grid grid-cols-12 gap-3 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <div class="col-span-4">Nombre completo</div>
+                    <div class="col-span-3">Rol / Profesión</div>
+                    <div class="col-span-2">Registro prof.</div>
+                    <div class="col-span-2">Fecha</div>
+                    <div class="col-span-1"></div>
+                </div>
+
+                <div id="evaluadoresContenedor" class="space-y-3"></div>
+            </div>
+
+            <!-- APOYOS -->
+            <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700/70 shadow-xl space-y-4">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-hand-holding-heart text-teal-400"></i>
+                        Apoyos Requeridos
+                    </h2>
+                    <% if (!finalizado) { %>
+                        <button type="button" id="btnAgregarApoyo" class="px-3 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                            <span>Añadir Apoyo</span>
+                        </button>
+                    <% } %>
+                </div>
+
+                <div class="hidden md:grid grid-cols-12 gap-3 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <div class="col-span-4">Área de apoyo</div>
+                    <div class="col-span-5">Descripción de la intervención</div>
+                    <div class="col-span-2">Hrs. semanales</div>
+                    <div class="col-span-1"></div>
+                </div>
+
+                <div id="apoyosContenedor" class="space-y-3"></div>
+            </div>
+        </fieldset>
+
+        <% if (!finalizado) { %>
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3">
+                <a href="/profesor/estudiantes" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl text-xs transition text-center">Cancelar</a>
+                <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span><%= fudei ? 'Guardar Cambios' : 'Crear FUDEI' %></span>
+                </button>
+            </div>
+        <% } %>
+    </form>
+
+    <% if (fudei && !finalizado) { %>
+        <form id="formFinalizar" action="/profesor/fudei/<%= estudiante.id_estudiante %>/finalizar" method="POST"
+              class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/70 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="text-xs text-slate-300">
+                <p class="font-bold text-white mb-0.5">Finalizar expediente</p>
+                <p class="text-slate-400">Guarda tus cambios antes de finalizar. Una vez finalizado, el FUDEI no se podrá modificar ni eliminar.</p>
+            </div>
+            <button type="button" id="btnFinalizar" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Finalizar FUDEI</span>
+            </button>
+        </form>
+    <% } %>
+</div>
+
+<script id="datosFudei" type="application/json"><%- JSON.stringify({
+    evaluadores: evaluadores.map((e) => ({ nombre: e.nombre_completo, rol: e.rol_profesional, registro: e.registro_profesional, fecha: e.fecha_evaluacion_fmt })),
+    apoyos: apoyos.map((a) => ({ area: a.area_apoyo, descripcion: a.descripcion_intervencion, horas: a.frecuencia_semanal_hrs })),
+    finalizado: finalizado,
+    success: success,
+    error: error
+}).replace(/</g, '\\u003c') %></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const datos = JSON.parse(document.getElementById('datosFudei').textContent);
+        const campo = '<%= campo %>';
+
+        Educare.mostrarMensajes({ success: datos.success, error: datos.error });
+
+        function entrada(tipo, nombre, valor, placeholder, extra) {
+            const el = document.createElement('input');
+            el.type = tipo;
+            el.name = nombre;
+            el.value = valor === null || valor === undefined ? '' : valor;
+            el.className = campo;
+            if (placeholder) el.placeholder = placeholder;
+            Object.keys(extra || {}).forEach((k) => el.setAttribute(k, extra[k]));
+            return el;
+        }
+
+        function columna(clases, hijo) {
+            const div = document.createElement('div');
+            div.className = clases;
+            if (hijo) div.appendChild(hijo);
+            return div;
+        }
+
+        function botonQuitar() {
+            const boton = document.createElement('button');
+            boton.type = 'button';
+            boton.className = 'p-2 text-slate-400 hover:text-rose-400 text-xs transition';
+            boton.title = 'Quitar';
+            boton.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            boton.addEventListener('click', () => boton.closest('[data-fila]').remove());
+            return boton;
+        }
+
+        function fila(columnas) {
+            const div = document.createElement('div');
+            div.setAttribute('data-fila', '1');
+            div.className = 'grid grid-cols-12 gap-3 p-3 rounded-xl border border-slate-700/70 bg-slate-900/60 items-center';
+            columnas.forEach((c) => div.appendChild(c));
+            return div;
+        }
+
+        function agregarEvaluador(v) {
+            v = v || {};
+            const quitar = columna('col-span-12 md:col-span-1 flex justify-end md:justify-center', datos.finalizado ? null : botonQuitar());
+            document.getElementById('evaluadoresContenedor').appendChild(fila([
+                columna('col-span-12 md:col-span-4', entrada('text', 'evaluador_nombre', v.nombre, 'Nombre completo', { maxlength: 150 })),
+                columna('col-span-12 md:col-span-3', entrada('text', 'evaluador_rol', v.rol, 'Rol / Profesión', { maxlength: 100 })),
+                columna('col-span-12 md:col-span-2', entrada('text', 'evaluador_registro', v.registro, 'Registro', { maxlength: 50 })),
+                columna('col-span-12 md:col-span-2', entrada('date', 'evaluador_fecha', v.fecha, '', { 'data-date-rule': 'past' })),
+                quitar
+            ]));
+        }
+
+        function agregarApoyo(v) {
+            v = v || {};
+            const quitar = columna('col-span-12 md:col-span-1 flex justify-end md:justify-center', datos.finalizado ? null : botonQuitar());
+            document.getElementById('apoyosContenedor').appendChild(fila([
+                columna('col-span-12 md:col-span-4', entrada('text', 'apoyo_area', v.area, 'Ej: Psicopedagogía', { maxlength: 100 })),
+                columna('col-span-12 md:col-span-5', entrada('text', 'apoyo_descripcion', v.descripcion, 'Descripción de la intervención')),
+                columna('col-span-12 md:col-span-2', entrada('number', 'apoyo_horas', v.horas === undefined ? '1.0' : v.horas, 'Horas', { step: '0.5', min: '0.5', max: '40' })),
+                quitar
+            ]));
+        }
+
+        if (datos.evaluadores.length > 0) datos.evaluadores.forEach(agregarEvaluador);
+        else if (!datos.finalizado) agregarEvaluador();
+
+        if (datos.apoyos.length > 0) datos.apoyos.forEach(agregarApoyo);
+        else if (!datos.finalizado) agregarApoyo();
+
+        const btnEvaluador = document.getElementById('btnAgregarEvaluador');
+        const btnApoyo = document.getElementById('btnAgregarApoyo');
+        if (btnEvaluador) btnEvaluador.addEventListener('click', () => agregarEvaluador());
+        if (btnApoyo) btnApoyo.addEventListener('click', () => agregarApoyo());
+
+        const btnFinalizar = document.getElementById('btnFinalizar');
+        if (btnFinalizar) {
+            btnFinalizar.addEventListener('click', async () => {
+                const r = await Educare.confirmar({
+                    icon: 'warning',
+                    title: '¿Finalizar el FUDEI?',
+                    text: 'Esta acción es definitiva: el expediente ya no podrá modificarse ni eliminarse.',
+                    confirmButtonText: 'Sí, finalizar',
+                    confirmButtonColor: '#059669'
+                });
+                if (r.isConfirmed) document.getElementById('formFinalizar').submit();
+            });
+        }
+    });
+</script>
+
+<%- include('../partials/footer') %>

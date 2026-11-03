@@ -1,0 +1,214 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-6 max-w-7xl mx-auto pb-6">
+
+    <!-- Encabezado de la Sección -->
+    <div class="bg-slate-800/90 p-6 rounded-2xl shadow-xl border border-slate-700/70 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="/admin" class="p-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-600/60" title="Volver al Panel Admin">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">Gestión de Avisos y Circulares</h1>
+                <p class="text-xs text-slate-400">Emisión de comunicados oficiales para la comunidad escolar</p>
+            </div>
+        </div>
+        <span class="px-3 py-1 bg-rose-500/10 text-rose-300 border border-rose-500/30 rounded-full text-xs font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn text-rose-400"></i>
+            Módulo Institucional
+        </span>
+    </div>
+
+    <!-- Grid de 12 Columnas: Formulario (5 cols) vs Historial (7 cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- IZQUIERDA (5 COLS): FORMULARIO DE NUEVO AVISO -->
+        <div class="lg:col-span-5 bg-slate-800/90 rounded-2xl p-6 border border-slate-700/70 shadow-xl space-y-4">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-700/60">
+                <div class="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <h2 class="text-base font-bold text-white">Publicar Nuevo Comunicado</h2>
+            </div>
+
+            <form action="/admin/avisos/crear" method="POST" class="space-y-4">
+                <!-- Título -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Título del Aviso</label>
+                    <input type="text" name="titulo" placeholder="Ej: Reunión General de Apoderados" required
+                           class="w-full bg-slate-900 text-slate-100 text-xs px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition">
+                </div>
+
+                <!-- Prioridad y Destinatario -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Prioridad</label>
+                        <select name="prioridad" class="w-full bg-slate-900 text-slate-100 text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition">
+                            <option value="Normal" selected>Normal</option>
+                            <option value="Alta">Alta (Urgente)</option>
+                            <option value="Baja">Baja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Alcance / Destino</label>
+                        <select id="tipoDestinoSelect" name="tipo_destino" onchange="toggleDestinoOptions()"
+                                class="w-full bg-slate-900 text-slate-100 text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition">
+                            <option value="GLOBAL">Toda la Escuela</option>
+                            <option value="ROL">Por Rol de Usuario</option>
+                            <option value="CURSO">Por Curso Específico</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Opciones dinámicas según destinatario -->
+                <div id="rolSelector" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Seleccionar Rol Destino</label>
+                    <select name="id_rol" class="w-full bg-slate-900 text-slate-100 text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition">
+                        <% if (typeof roles !== 'undefined') { %>
+                            <% roles.forEach(r => { %>
+                                <option value="<%= r.id_rol %>"><%= r.nombre %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div id="cursoSelector" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Seleccionar Curso Destino</label>
+                    <select name="id_curso" class="w-full bg-slate-900 text-slate-100 text-xs px-3 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition">
+                        <% if (typeof cursos !== 'undefined') { %>
+                            <% cursos.forEach(c => { %>
+                                <option value="<%= c.id_curso %>"><%= c.nombre_curso %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <!-- Fecha de Expiración -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Fecha de Expiración (Opcional)</label>
+                    <input type="date" data-date-rule="future" name="fecha_expiracion" 
+                           class="w-full bg-slate-900 text-slate-100 text-xs px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition">
+                </div>
+
+                <!-- Contenido -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Contenido del Comunicado</label>
+                    <textarea name="contenido" rows="4" placeholder="Escriba aquí el mensaje detallado..." required
+                              class="w-full bg-slate-900 text-slate-100 text-xs p-3.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500 transition resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-bullhorn text-xs"></i>
+                    <span>Publicar Comunicado</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- DERECHA (7 COLS): HISTORIAL DE AVISOS PUBLICADOS -->
+        <div class="lg:col-span-7 bg-slate-800/90 rounded-2xl p-6 border border-slate-700/70 shadow-xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700/60">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-white">Avisos Emitidos</h2>
+                </div>
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+                    <%= typeof avisos !== 'undefined' ? avisos.length : 0 %> publicados
+                </span>
+            </div>
+
+            <!-- Feed de Publicaciones -->
+            <div class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                <% if (typeof avisos !== 'undefined' && avisos.length > 0) { %>
+                    <% avisos.forEach(a => { %>
+                        <div class="p-4 rounded-xl border border-slate-700/60 bg-slate-900/60 space-y-2">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xs font-bold text-white"><%= a.titulo %></h3>
+                                        
+                                        <!-- Badge de Prioridad -->
+                                        <% if (a.prioridad === 'Alta') { %>
+                                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">Alta</span>
+                                        <% } else if (a.prioridad === 'Normal') { %>
+                                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Normal</span>
+                                        <% } else { %>
+                                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-700 text-slate-300">Baja</span>
+                                        <% } %>
+                                    </div>
+
+                                    <p class="text-[10px] text-slate-400">
+                                        Por: <span class="text-slate-200"><%= a.autor_nombre %> <%= a.autor_apellido %></span> • 
+                                        <%= new Date(a.fecha_publicacion).toLocaleDateString('es-CL') %>
+                                    </p>
+                                </div>
+
+                                <!-- Badge de Destinatario -->
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700 shrink-0">
+                                    <% if (a.tipo_destino === 'ROL') { %>
+                                        Rol: <%= a.nombre_rol || 'Rol' %>
+                                    <% } else if (a.tipo_destino === 'CURSO') { %>
+                                        Curso: <%= a.nombre_curso || 'Curso' %>
+                                    <% } else { %>
+                                        Global
+                                    <% } %>
+                                </span>
+                            </div>
+
+                            <p class="text-xs text-slate-300 leading-relaxed bg-slate-950/40 p-3 rounded-lg border border-slate-800">
+                                <%= a.contenido %>
+                            </p>
+
+                            <div class="flex justify-end">
+                                <form action="/admin/avisos/eliminar/<%= a.id_aviso %>" method="POST" class="inline">
+                                    <button type="button" data-titulo="<%= a.titulo %>" onclick="confirmarEliminarAviso(this)"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-[11px] font-semibold rounded-xl transition">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                        <span>Eliminar</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="text-center py-12 bg-slate-900/40 rounded-xl border border-dashed border-slate-700/80 space-y-2">
+                        <i class="fa-solid fa-bullhorn text-3xl text-slate-600"></i>
+                        <p class="text-xs text-slate-400">No se han publicado avisos institucionales aún.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function confirmarEliminarAviso(btn) {
+        Educare.confirmar({
+            title: '¿Eliminar este aviso?',
+            text: 'Se eliminará "' + (btn.dataset.titulo || 'el comunicado') + '" del historial y de la base de datos. Esta acción no se puede deshacer.',
+            confirmButtonText: 'Sí, eliminar'
+        }).then(function (resultado) {
+            if (resultado.isConfirmed) btn.closest('form').submit();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        Educare.mostrarMensajes(<%- JSON.stringify({ success: typeof success !== 'undefined' ? success : null, error: typeof error !== 'undefined' ? error : null }).replace(/</g, '\\u003c') %>);
+    });
+
+    function toggleDestinoOptions() {
+        const val = document.getElementById('tipoDestinoSelect').value;
+        const rolDiv = document.getElementById('rolSelector');
+        const cursoDiv = document.getElementById('cursoSelector');
+
+        rolDiv.classList.add('hidden');
+        cursoDiv.classList.add('hidden');
+
+        if (val === 'ROL') rolDiv.classList.remove('hidden');
+        if (val === 'CURSO') cursoDiv.classList.remove('hidden');
+    }
+</script>
+
+<%- include('../partials/footer') %>

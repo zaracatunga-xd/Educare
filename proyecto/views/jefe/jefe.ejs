@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto space-y-5 pb-8">
+<% if (vacio) { %>
+    <%- include('_vacio') %>
+<% } else { %>
+    <%- include('_nav') %>
+
+    <% const colorNota = (n) => n === null ? 'text-slate-500' : (n >= 4 ? 'text-teal-400' : 'text-rose-400'); %>
+    <% const pendientesChat = typeof mensajesPendientes !== 'undefined' ? mensajesPendientes : 0; %>
+
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Estudiantes</p>
+            <p class="text-3xl font-black text-teal-400"><%= estudiantes.length %></p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Promedio del curso</p>
+            <p class="text-3xl font-black <%= colorNota(notas.promedioCurso) %>"><%= notas.promedioCurso === null ? '-' : notas.promedioCurso.toFixed(1) %></p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Asistencia</p>
+            <p class="text-3xl font-black <%= asistencia.porcentajeCurso !== null && asistencia.porcentajeCurso < umbralAsistencia ? 'text-rose-400' : 'text-sky-400' %>"><%= asistencia.porcentajeCurso === null ? '-' : asistencia.porcentajeCurso + '%' %></p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">FUDEI en proceso</p>
+            <p class="text-3xl font-black text-amber-400"><%= fudei.enProceso %><span class="text-sm text-slate-500 font-bold"> / <%= fudei.conNee %></span></p>
+        </div>
+        <a href="/profesor/atencionApo" id="tarjetaChat" class="bg-slate-900/90 border <%= pendientesChat > 0 ? 'border-sky-500/60' : 'border-slate-800' %> rounded-2xl p-4 text-center shadow-lg flex flex-col items-center justify-center hover:bg-slate-800 transition">
+            <div class="flex items-center gap-1 mb-1">
+                <p class="text-[10px] font-bold <%= pendientesChat > 0 ? 'text-sky-300' : 'text-slate-400' %> uppercase tracking-wider" data-chat-titulo>Mensajes</p>
+                <span data-chat-ping class="w-2 h-2 rounded-full bg-sky-400 animate-ping <%= pendientesChat > 0 ? '' : 'hidden' %>"></span>
+            </div>
+            <p class="text-xl font-extrabold text-sky-400 <%= pendientesChat > 0 ? 'hidden' : '' %>" data-chat-activo>Al día</p>
+            <p class="text-sm font-extrabold text-white <%= pendientesChat > 0 ? '' : 'hidden' %>" data-chat-pendientes>
+                <i class="fa-solid fa-envelope text-sky-400 mr-1"></i><span data-chat-total><%= pendientesChat %></span> <span class="text-[10px] font-bold text-sky-300 uppercase">pendiente(s)</span>
+            </p>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-7 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+            <div class="p-4 sm:px-6 border-b border-slate-800 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-book-open text-amber-400"></i> Rendimiento por asignatura</h2>
+                <a href="/jefe/notas?curso=<%= curso.id_curso_periodo %>" class="text-[11px] font-bold text-amber-300 hover:text-amber-200">Ver todas las notas &rarr;</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-950/60">
+                            <th class="py-2.5 px-4">Asignatura</th>
+                            <th class="py-2.5 px-3">Docente</th>
+                            <th class="py-2.5 px-3 text-center">Eval.</th>
+                            <th class="py-2.5 px-3 text-center">Promedio</th>
+                            <th class="py-2.5 px-3 text-center">Bajo 4,0</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <% notas.columnas.forEach((c) => { %>
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 px-4 font-semibold text-white"><%= c.nombre %></td>
+                                <td class="py-2.5 px-3 text-slate-300"><%= c.profesor %></td>
+                                <td class="py-2.5 px-3 text-center text-slate-300"><%= c.evaluaciones %></td>
+                                <td class="py-2.5 px-3 text-center font-black <%= colorNota(c.promedio) %>"><%= c.promedio === null ? '-' : c.promedio.toFixed(1) %></td>
+                                <td class="py-2.5 px-3 text-center <%= c.reprobados > 0 ? 'text-rose-400 font-bold' : 'text-slate-500' %>"><%= c.reprobados %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lg:col-span-5 space-y-5">
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-5 space-y-3">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Estudiantes en riesgo académico</h2>
+                <% if (enRiesgo.length === 0) { %>
+                    <p class="text-xs text-slate-400">Ningún estudiante con promedio bajo 4,0 ni con dos o más asignaturas reprobadas.</p>
+                <% } else { %>
+                    <ul class="divide-y divide-slate-800">
+                        <% enRiesgo.forEach((f) => { %>
+                            <li class="py-2 flex items-center justify-between gap-3">
+                                <a href="/jefe/estudiante/<%= f.id_estudiante %>?curso=<%= curso.id_curso_periodo %>" class="text-xs font-semibold text-slate-100 hover:text-amber-300 truncate"><%= f.nombre_completo %></a>
+                                <span class="text-[11px] text-slate-400 shrink-0"><%= f.reprobadas %> bajo 4,0 &bull; <span class="font-black <%= colorNota(f.general) %>"><%= f.general.toFixed(1) %></span></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+            </div>
+
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-5 space-y-3">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-user-clock text-amber-400"></i> Asistencia bajo <%= umbralAsistencia %>%</h2>
+                <% if (asistenciaBaja.length === 0) { %>
+                    <p class="text-xs text-slate-400">Todos los estudiantes cumplen la asistencia mínima.</p>
+                <% } else { %>
+                    <ul class="divide-y divide-slate-800">
+                        <% asistenciaBaja.forEach((f) => { %>
+                            <li class="py-2 flex items-center justify-between gap-3">
+                                <a href="/jefe/estudiante/<%= f.id_estudiante %>?curso=<%= curso.id_curso_periodo %>" class="text-xs font-semibold text-slate-100 hover:text-amber-300 truncate"><%= f.nombre_completo %></a>
+                                <span class="text-[11px] font-black text-rose-400 shrink-0"><%= f.porcentaje %>%</span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+            </div>
+
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-5 space-y-3">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-trophy text-amber-400"></i> Mejores promedios</h2>
+                <% if (mejores.length === 0) { %>
+                    <p class="text-xs text-slate-400">Aún no hay calificaciones registradas.</p>
+                <% } else { %>
+                    <ol class="space-y-1.5">
+                        <% mejores.forEach((f, i) => { %>
+                            <li class="flex items-center justify-between text-xs">
+                                <span class="text-slate-200"><span class="text-amber-400 font-black mr-2"><%= i + 1 %>.</span><%= f.nombre_completo %></span>
+                                <span class="font-black text-teal-400"><%= f.general.toFixed(1) %></span>
+                            </li>
+                        <% }) %>
+                    </ol>
+                <% } %>
+            </div>
+        </div>
+    </div>
+<% } %>
+</div>
+
+<script src="/js/pendientes.js"></script>
+<%- include('../partials/footer') %>

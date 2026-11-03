@@ -1,0 +1,362 @@
+<%- include('../partials/header') %>
+
+<%
+    const sinAsignaciones = asignaciones.length === 0;
+    const claseNueva = !sesionActual;
+    const campo = 'w-full bg-slate-900 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-400 disabled:opacity-60';
+    const etiqueta = 'block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1';
+%>
+
+<div class="space-y-5 max-w-6xl mx-auto pb-8">
+
+    <!-- CABECERA -->
+    <div class="bg-slate-800/90 p-5 rounded-2xl shadow-xl border border-slate-700/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <a href="/profesor" class="p-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-600/60 shrink-0" title="Volver al panel">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-check text-teal-400"></i>
+                    Registro de Asistencia
+                </h1>
+                <p class="text-xs text-slate-400">Marca la asistencia de cada alumno por clase. Puedes guardar alumno por alumno o todo el curso a la vez.</p>
+            </div>
+        </div>
+
+        <% if (!sinAsignaciones && estudiantes.length > 0) { %>
+            <button type="button" id="btnGuardarTodo" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md transition cursor-pointer">
+                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                <span>Guardar Asistencia</span>
+            </button>
+        <% } %>
+    </div>
+
+    <% if (sinAsignaciones) { %>
+        <div class="bg-slate-800/90 p-12 rounded-2xl border border-slate-700/70 shadow-xl text-center space-y-3">
+            <i class="fa-solid fa-calendar-xmark text-4xl text-slate-600"></i>
+            <p class="text-sm text-slate-300 font-semibold">Aún no tienes cursos ni asignaturas asignadas.</p>
+            <p class="text-xs text-slate-500">Pide al administrador que te asigne una asignatura en un curso para poder registrar asistencia.</p>
+        </div>
+    <% } else { %>
+
+        <!-- FILTROS -->
+        <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/70 shadow-xl space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-5">
+                    <label class="<%= etiqueta %>">Curso y asignatura</label>
+                    <select id="selAsignacion" class="<%= campo %>">
+                        <% asignaciones.forEach((a) => { %>
+                            <option value="<%= a.id_curso_asig %>" <%= seleccionada && a.id_curso_asig === seleccionada.id_curso_asig ? 'selected' : '' %>><%= a.etiqueta %></option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="md:col-span-3">
+                    <label class="<%= etiqueta %>">Fecha de la clase</label>
+                    <input type="date" id="inpFecha" value="<%= fecha %>" max="<%= hoy %>" min="1990-01-01" class="<%= campo %>">
+                </div>
+
+                <div class="md:col-span-4">
+                    <label class="<%= etiqueta %>">Clase del día</label>
+                    <select id="selSesion" class="<%= campo %>">
+                        <% sesiones.forEach((s) => { %>
+                            <option value="<%= s.id_sesion %>" <%= sesionActual && s.id_sesion === sesionActual.id_sesion ? 'selected' : '' %>><%= s.hora_inicio %> – <%= s.hora_fin %><%= s.sala ? ' · Sala ' + s.sala : '' %></option>
+                        <% }) %>
+                        <option value="nueva" <%= claseNueva ? 'selected' : '' %>>+ Registrar nueva clase</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="datosClaseNueva" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-700/70 <%= claseNueva ? '' : 'hidden' %>">
+                <div>
+                    <label class="<%= etiqueta %>">Hora de inicio</label>
+                    <input type="time" id="inpHoraInicio" value="08:00" class="<%= campo %>">
+                </div>
+                <div>
+                    <label class="<%= etiqueta %>">Hora de término</label>
+                    <input type="time" id="inpHoraFin" value="09:30" class="<%= campo %>">
+                </div>
+                <div>
+                    <label class="<%= etiqueta %>">Sala (opcional)</label>
+                    <input type="text" id="inpSala" maxlength="20" placeholder="Ej: 101" class="<%= campo %>">
+                </div>
+            </div>
+        </div>
+
+        <!-- MÉTRICAS -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-4 py-3">
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Matriculados</p>
+                <p id="cntTotal" class="text-xl font-black text-white">0</p>
+            </div>
+            <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
+                <p class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Presentes</p>
+                <p id="cntPresentes" class="text-xl font-black text-emerald-300">0</p>
+            </div>
+            <div class="bg-rose-500/10 border border-rose-500/30 rounded-xl px-4 py-3">
+                <p class="text-[9px] font-bold text-rose-400 uppercase tracking-wider">Ausentes</p>
+                <p id="cntAusentes" class="text-xl font-black text-rose-300">0</p>
+            </div>
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3">
+                <p class="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Tardanzas</p>
+                <p id="cntTardanzas" class="text-xl font-black text-amber-300">0</p>
+            </div>
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl px-4 py-3 col-span-2 lg:col-span-1">
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Sin registrar</p>
+                <p id="cntPendientes" class="text-xl font-black text-slate-300">0</p>
+            </div>
+        </div>
+
+        <!-- LISTA DE ALUMNOS -->
+        <div class="bg-slate-800/90 rounded-2xl border border-slate-700/70 shadow-xl overflow-hidden">
+            <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-slate-700/70 bg-slate-900/60">
+                <p class="text-xs font-bold text-slate-300">
+                    <%= seleccionada ? seleccionada.etiqueta : '' %> · <span class="text-teal-300"><%= fecha %></span>
+                </p>
+                <% if (estudiantes.length > 0) { %>
+                    <button type="button" id="btnTodosPresentes" class="px-3 py-1.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer">
+                        <i class="fa-solid fa-check-double"></i>
+                        Marcar todos presentes
+                    </button>
+                <% } %>
+            </div>
+
+            <% if (estudiantes.length === 0) { %>
+                <div class="p-12 text-center text-slate-500 space-y-2">
+                    <i class="fa-solid fa-users-slash text-3xl text-slate-600 block"></i>
+                    <p class="text-xs">No hay estudiantes matriculados en este curso.</p>
+                </div>
+            <% } else { %>
+                <div class="divide-y divide-slate-700/50" id="listaAlumnos">
+                    <% estudiantes.forEach((est) => { %>
+                        <div class="fila-alumno px-5 py-3 flex flex-col lg:flex-row lg:items-center gap-3"
+                             data-id="<%= est.id_estudiante %>" data-guardado="<%= est.estado ? '1' : '0' %>">
+                            <div class="flex items-center gap-3 lg:w-64 shrink-0 min-w-0">
+                                <div class="w-9 h-9 rounded-full bg-teal-500/20 text-teal-300 font-bold text-xs border border-teal-500/30 flex items-center justify-center shrink-0">
+                                    <%= est.nombre.charAt(0) %><%= est.apellido.charAt(0) %>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold text-white truncate"><%= est.apellido %>, <%= est.nombre %></p>
+                                    <p class="text-[10px] text-slate-400">RUT: <%= est.rut %></p>
+                                </div>
+                            </div>
+
+                            <input type="hidden" class="estado-valor" value="<%= est.estado %>">
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" data-estado="Presente" class="pill px-3 py-1.5 rounded-lg text-[11px] font-bold border transition cursor-pointer flex items-center gap-1.5">
+                                    <i class="fa-solid fa-check"></i> Presente
+                                </button>
+                                <button type="button" data-estado="Ausente" class="pill px-3 py-1.5 rounded-lg text-[11px] font-bold border transition cursor-pointer flex items-center gap-1.5">
+                                    <i class="fa-solid fa-xmark"></i> Ausente
+                                </button>
+                                <button type="button" data-estado="Tardanza" class="pill px-3 py-1.5 rounded-lg text-[11px] font-bold border transition cursor-pointer flex items-center gap-1.5">
+                                    <i class="fa-solid fa-clock"></i> Tardanza
+                                </button>
+                            </div>
+
+                            <input type="text" class="observacion flex-1 min-w-0 bg-slate-900 text-slate-200 text-xs px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-teal-400"
+                                   maxlength="255" placeholder="Observación (opcional)" value="<%= est.observacion %>">
+
+                            <div class="flex items-center gap-2 shrink-0 lg:w-44 justify-between lg:justify-end">
+                                <span class="estado-guardado text-[10px] font-semibold"></span>
+                                <button type="button" class="btn-guardar-fila px-3 py-1.5 bg-teal-600/20 hover:bg-teal-600 text-teal-300 hover:text-white border border-teal-500/30 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer" title="Guardar solo este alumno">
+                                    <i class="fa-solid fa-floppy-disk"></i> Guardar
+                                </button>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<script id="datosAsistencia" type="application/json"><%- JSON.stringify({
+    idCursoAsig: seleccionada ? seleccionada.id_curso_asig : null,
+    fecha: fecha,
+    idSesion: sesionActual ? sesionActual.id_sesion : null,
+    success: success,
+    error: error
+}).replace(/</g, '\\u003c') %></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const datos = JSON.parse(document.getElementById('datosAsistencia').textContent);
+        Educare.mostrarMensajes({ success: datos.success, error: datos.error });
+
+        const selAsignacion = document.getElementById('selAsignacion');
+        if (!selAsignacion) return;
+
+        const inpFecha = document.getElementById('inpFecha');
+        const selSesion = document.getElementById('selSesion');
+        const bloqueNueva = document.getElementById('datosClaseNueva');
+        const filas = Array.from(document.querySelectorAll('.fila-alumno'));
+        let idSesion = datos.idSesion;
+
+        const estilos = {
+            Presente: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50',
+            Ausente: 'bg-rose-500/20 text-rose-300 border-rose-500/50',
+            Tardanza: 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+        };
+        const inactivo = 'bg-slate-900 text-slate-400 border-slate-700';
+
+        function ir(parametros) {
+            const q = new URLSearchParams(parametros);
+            window.location.href = '/profesor/asistencia?' + q.toString();
+        }
+
+        selAsignacion.addEventListener('change', () => ir({ id_curso_asig: selAsignacion.value, fecha: inpFecha.value }));
+        inpFecha.addEventListener('change', () => {
+            if (!inpFecha.value || inpFecha.validity.rangeOverflow) return;
+            ir({ id_curso_asig: selAsignacion.value, fecha: inpFecha.value });
+        });
+        selSesion.addEventListener('change', () => ir({ id_curso_asig: selAsignacion.value, fecha: inpFecha.value, id_sesion: selSesion.value }));
+
+        function pintar(fila) {
+            const valor = fila.querySelector('.estado-valor').value;
+            fila.querySelectorAll('.pill').forEach((p) => {
+                const activo = p.getAttribute('data-estado') === valor;
+                Object.values(estilos).forEach((c) => c.split(' ').forEach((k) => p.classList.remove(k)));
+                inactivo.split(' ').forEach((k) => p.classList.remove(k));
+                (activo ? estilos[valor] : inactivo).split(' ').forEach((k) => p.classList.add(k));
+            });
+        }
+
+        function marcarEstado(fila, texto, clase) {
+            const el = fila.querySelector('.estado-guardado');
+            el.textContent = texto;
+            el.className = 'estado-guardado text-[10px] font-semibold ' + clase;
+        }
+
+        function refrescarEstadoFila(fila) {
+            const valor = fila.querySelector('.estado-valor').value;
+            if (fila.getAttribute('data-guardado') === '1') marcarEstado(fila, 'Guardado', 'text-emerald-400');
+            else marcarEstado(fila, valor ? 'Sin guardar' : 'Sin registrar', valor ? 'text-amber-400' : 'text-slate-500');
+        }
+
+        function contar() {
+            const c = { Presente: 0, Ausente: 0, Tardanza: 0 };
+            filas.forEach((f) => {
+                const v = f.querySelector('.estado-valor').value;
+                if (c[v] !== undefined) c[v]++;
+            });
+            document.getElementById('cntTotal').textContent = filas.length;
+            document.getElementById('cntPresentes').textContent = c.Presente;
+            document.getElementById('cntAusentes').textContent = c.Ausente;
+            document.getElementById('cntTardanzas').textContent = c.Tardanza;
+            document.getElementById('cntPendientes').textContent = filas.length - c.Presente - c.Ausente - c.Tardanza;
+        }
+
+        function sucio(fila) {
+            fila.setAttribute('data-guardado', '0');
+            refrescarEstadoFila(fila);
+        }
+
+        filas.forEach((fila) => {
+            pintar(fila);
+            refrescarEstadoFila(fila);
+            fila.querySelectorAll('.pill').forEach((p) => {
+                p.addEventListener('click', () => {
+                    fila.querySelector('.estado-valor').value = p.getAttribute('data-estado');
+                    pintar(fila);
+                    sucio(fila);
+                    contar();
+                });
+            });
+            fila.querySelector('.observacion').addEventListener('input', () => sucio(fila));
+            fila.querySelector('.btn-guardar-fila').addEventListener('click', () => guardar([fila], true));
+        });
+        contar();
+
+        const btnTodos = document.getElementById('btnTodosPresentes');
+        if (btnTodos) {
+            btnTodos.addEventListener('click', () => {
+                filas.forEach((fila) => {
+                    if (fila.querySelector('.estado-valor').value === 'Presente') return;
+                    fila.querySelector('.estado-valor').value = 'Presente';
+                    pintar(fila);
+                    sucio(fila);
+                });
+                contar();
+            });
+        }
+
+        function aSesionExistente(nuevoId, horaInicio, horaFin, sala) {
+            idSesion = nuevoId;
+            const opcion = document.createElement('option');
+            opcion.value = nuevoId;
+            opcion.textContent = horaInicio + ' – ' + horaFin + (sala ? ' · Sala ' + sala : '');
+            selSesion.insertBefore(opcion, selSesion.firstChild);
+            selSesion.value = String(nuevoId);
+            bloqueNueva.classList.add('hidden');
+        }
+
+        let guardando = false;
+        async function guardar(listaFilas, individual) {
+            if (guardando) return;
+            const registros = listaFilas
+                .filter((f) => f.querySelector('.estado-valor').value)
+                .map((f) => ({
+                    id_estudiante: Number(f.getAttribute('data-id')),
+                    estado: f.querySelector('.estado-valor').value,
+                    observacion: f.querySelector('.observacion').value.trim()
+                }));
+
+            if (registros.length === 0) {
+                Educare.notificar('warning', 'Sin datos', individual ? 'Marca Presente, Ausente o Tardanza antes de guardar.' : 'Marca la asistencia de al menos un alumno.');
+                return;
+            }
+
+            const horaInicio = document.getElementById('inpHoraInicio').value;
+            const horaFin = document.getElementById('inpHoraFin').value;
+            const sala = document.getElementById('inpSala').value.trim();
+
+            guardando = true;
+            document.querySelectorAll('.btn-guardar-fila, #btnGuardarTodo').forEach((b) => { b.disabled = true; b.classList.add('opacity-60'); });
+            try {
+                const respuesta = await fetch('/profesor/asistencia/guardar', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_curso_asig: datos.idCursoAsig,
+                        fecha: datos.fecha,
+                        id_sesion: idSesion || 'nueva',
+                        hora_inicio: horaInicio,
+                        hora_fin: horaFin,
+                        sala: sala,
+                        registros: registros
+                    })
+                });
+                const resultado = await respuesta.json().catch(() => ({}));
+                if (!respuesta.ok || !resultado.ok) throw new Error(resultado.error || 'No se pudo guardar la asistencia.');
+
+                if (!idSesion) aSesionExistente(resultado.id_sesion, horaInicio, horaFin, sala);
+
+                listaFilas.forEach((f) => {
+                    if (!f.querySelector('.estado-valor').value) return;
+                    f.setAttribute('data-guardado', '1');
+                    refrescarEstadoFila(f);
+                });
+
+                if (individual) {
+                    const nombre = listaFilas[0].querySelector('p').textContent;
+                    Educare.notificar('success', 'Asistencia guardada', nombre);
+                } else {
+                    Educare.notificar('success', 'Asistencia guardada', resultado.guardados + ' alumno(s) registrados.');
+                }
+            } catch (error) {
+                Educare.notificar('error', 'No se pudo guardar', error.message);
+            } finally {
+                guardando = false;
+                document.querySelectorAll('.btn-guardar-fila, #btnGuardarTodo').forEach((b) => { b.disabled = false; b.classList.remove('opacity-60'); });
+            }
+        }
+
+        const btnGuardarTodo = document.getElementById('btnGuardarTodo');
+        if (btnGuardarTodo) btnGuardarTodo.addEventListener('click', () => guardar(filas, false));
+    });
+</script>
+
+<%- include('../partials/footer') %>

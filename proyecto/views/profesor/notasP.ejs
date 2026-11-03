@@ -1,0 +1,392 @@
+<%- include('../partials/header') %>
+
+<%
+    const sinAsignaciones = asignaciones.length === 0;
+    const disponible = Math.max(0, Math.round((100 - porcentajeUsado) * 100) / 100);
+    const campo = 'w-full bg-slate-900 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400';
+    const etiqueta = 'block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1';
+    const formatoFecha = (iso) => iso ? iso.split('-').reverse().slice(0, 2).join('/') : '';
+%>
+
+<div class="space-y-5 max-w-7xl mx-auto pb-8">
+
+    <!-- ENCABEZADO -->
+    <div class="bg-slate-800/90 p-5 rounded-2xl shadow-xl border border-slate-700/70 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4 w-full md:w-auto">
+            <a href="/profesor" class="p-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-600/60 shrink-0" title="Volver al Panel">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-amber-400"></i>
+                    Registro de Calificaciones
+                </h1>
+                <p class="text-xs text-slate-400">Notas por evaluación, con promedio ponderado por curso y asignatura</p>
+            </div>
+        </div>
+
+        <% if (!sinAsignaciones) { %>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <button type="button" id="btnNuevaEvaluacion" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-100 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer border border-slate-600">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                    <span>Nueva evaluación</span>
+                </button>
+                <button type="button" id="btnGuardarNotas" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer">
+                    <i class="fa-solid fa-floppy-disk text-sm"></i>
+                    <span>Guardar Calificaciones</span>
+                </button>
+            </div>
+        <% } %>
+    </div>
+
+    <% if (sinAsignaciones) { %>
+        <div class="bg-slate-800/90 p-12 rounded-2xl border border-slate-700/70 shadow-xl text-center space-y-3">
+            <i class="fa-solid fa-graduation-cap text-4xl text-slate-600"></i>
+            <p class="text-sm text-slate-300 font-semibold">Aún no tienes cursos ni asignaturas asignadas.</p>
+            <p class="text-xs text-slate-500">Pide al administrador que te asigne una asignatura en un curso para poder registrar calificaciones.</p>
+        </div>
+    <% } else { %>
+
+        <!-- SELECCIÓN Y BÚSQUEDA -->
+        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/70 shadow-xl grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <div class="sm:col-span-7">
+                <label class="<%= etiqueta %>">Curso y asignatura</label>
+                <select id="selectAsignacion" class="<%= campo %>">
+                    <% asignaciones.forEach((a) => { %>
+                        <option value="<%= a.id_curso_asig %>" <%= seleccionada && a.id_curso_asig === seleccionada.id_curso_asig ? 'selected' : '' %>><%= a.etiqueta %></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="sm:col-span-5">
+                <label class="<%= etiqueta %>">Buscar alumno</label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="inputBuscarAlumno" placeholder="Nombre o RUT..." class="<%= campo %> pl-8">
+                </div>
+            </div>
+
+            <div class="sm:col-span-12">
+                <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                    <span>Ponderación asignada a las evaluaciones</span>
+                    <span class="font-bold <%= disponible === 0 ? 'text-emerald-300' : 'text-amber-300' %>"><%= porcentajeUsado %>% de 100%</span>
+                </div>
+                <div class="h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
+                    <div class="h-full bg-amber-500" style="width: <%= Math.min(100, porcentajeUsado) %>%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLANILLA -->
+        <div class="bg-slate-800/90 rounded-2xl border border-slate-700/70 shadow-xl overflow-hidden">
+            <% if (evaluaciones.length === 0) { %>
+                <div class="p-12 text-center text-slate-500 space-y-3">
+                    <i class="fa-solid fa-clipboard-list text-3xl text-slate-600 block"></i>
+                    <p class="text-xs">Esta asignatura aún no tiene evaluaciones. Crea la primera para empezar a registrar notas.</p>
+                    <button type="button" data-abrir-evaluacion class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer">Nueva evaluación</button>
+                </div>
+            <% } else if (estudiantes.length === 0) { %>
+                <div class="p-12 text-center text-slate-500 space-y-2">
+                    <i class="fa-solid fa-users-slash text-3xl text-slate-600 block"></i>
+                    <p class="text-xs">No hay estudiantes matriculados en este curso.</p>
+                </div>
+            <% } else { %>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" style="min-width: <%= 520 + evaluaciones.length * 96 %>px">
+                        <thead>
+                            <tr class="bg-slate-900/90 text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-700/70">
+                                <th class="py-3.5 px-4 w-64">Estudiante</th>
+                                <% evaluaciones.forEach((ev) => { %>
+                                    <th class="py-3 px-2 text-center w-24" title="<%= ev.tipo %> · <%= ev.nombre %>">
+                                        <span class="block truncate max-w-[88px] mx-auto"><%= ev.nombre %></span>
+                                        <span class="block text-[9px] font-normal text-slate-500 normal-case"><%= formatoFecha(ev.fecha) %> · <%= ev.porcentaje %>%</span>
+                                    </th>
+                                <% }) %>
+                                <th class="py-3.5 px-2 text-center w-24">Promedio</th>
+                                <th class="py-3.5 px-4">Observación Pedagógica</th>
+                                <th class="py-3.5 px-3 text-center w-20">Informe</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/50 text-xs" id="tablaNotasBody">
+                            <% estudiantes.forEach((est) => { %>
+                                <tr class="item-alumno-row hover:bg-slate-700/30 transition <%= idEstudianteDestacado === est.id_estudiante ? 'bg-amber-500/10' : '' %>"
+                                    data-id="<%= est.id_estudiante %>"
+                                    data-nombre="<%= (est.nombre + ' ' + est.apellido).toLowerCase() %>"
+                                    data-rut="<%= (est.rut || '').toLowerCase() %>">
+
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/30 flex items-center justify-center shrink-0">
+                                                <%= est.nombre.charAt(0) %><%= est.apellido.charAt(0) %>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="font-bold text-white truncate"><%= est.nombre %> <%= est.apellido %></p>
+                                                <p class="text-[10px] text-slate-400">RUT: <%= est.rut %></p>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <% evaluaciones.forEach((ev) => { %>
+                                        <% const nota = est.notas[ev.id_evaluacion]; %>
+                                        <td class="py-3 px-2 text-center">
+                                            <input type="number" step="0.1" min="1" max="7" inputmode="decimal"
+                                                   data-evaluacion="<%= ev.id_evaluacion %>" data-peso="<%= ev.porcentaje %>"
+                                                   data-original="<%= nota === null ? '' : nota %>"
+                                                   value="<%= nota === null ? '' : nota %>" placeholder="–"
+                                                   class="input-nota w-16 bg-slate-900 text-center text-white font-bold text-xs py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-amber-400">
+                                        </td>
+                                    <% }) %>
+
+                                    <td class="py-3 px-2 text-center">
+                                        <span class="elem-promedio font-extrabold text-sm px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 inline-block min-w-[50px]">--</span>
+                                    </td>
+
+                                    <td class="py-3 px-4">
+                                        <input type="text" maxlength="255" data-original="<%= est.observacion %>" value="<%= est.observacion %>"
+                                               placeholder="Ej: Progreso positivo en NEE..."
+                                               class="input-observacion w-full bg-slate-900 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-amber-400">
+                                    </td>
+
+                                    <td class="py-3 px-3 text-center">
+                                        <a href="/profesor/informe-notas/<%= est.id_estudiante %>"
+                                           class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white rounded-lg text-[11px] font-semibold transition border border-sky-500/30"
+                                           title="Descargar informe de notas (con las notas ya guardadas)">
+                                            <i class="fa-solid fa-file-arrow-down"></i>
+                                            <span>PDF</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<!-- MODAL NUEVA EVALUACIÓN -->
+<div id="modalEvaluacion" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700/80 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list text-amber-400"></i>
+                Nueva evaluación
+            </h3>
+            <button type="button" data-cerrar-evaluacion class="text-slate-400 hover:text-white transition text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="formEvaluacion" class="space-y-4">
+            <div>
+                <label class="<%= etiqueta %>">Nombre</label>
+                <input type="text" id="evNombre" maxlength="100" required placeholder="Ej: Prueba Unidad 1" class="<%= campo %>">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="<%= etiqueta %>">Tipo</label>
+                    <select id="evTipo" class="<%= campo %>">
+                        <option>Prueba</option>
+                        <option>Control</option>
+                        <option>Trabajo</option>
+                        <option>Tarea</option>
+                        <option>Proyecto</option>
+                        <option>Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="<%= etiqueta %>">Fecha</label>
+                    <input type="date" id="evFecha" required value="<%= hoy %>" min="<%= fechaMin %>" max="<%= fechaMax %>" class="<%= campo %>">
+                </div>
+            </div>
+            <div>
+                <label class="<%= etiqueta %>">Ponderación (%) · disponible: <%= disponible %>%</label>
+                <input type="number" id="evPorcentaje" step="0.5" min="0.5" max="<%= disponible || 100 %>" required value="<%= Math.min(disponible, 25) || '' %>" class="<%= campo %>">
+            </div>
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button type="button" data-cerrar-evaluacion class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold text-xs rounded-xl transition">Cancelar</button>
+                <button type="submit" id="btnCrearEvaluacion" class="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition shadow-md flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Crear evaluación</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script id="datosNotas" type="application/json"><%- JSON.stringify({
+    idCursoAsig: seleccionada ? seleccionada.id_curso_asig : null,
+    destacado: idEstudianteDestacado
+}).replace(/</g, '\\u003c') %></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const datos = JSON.parse(document.getElementById('datosNotas').textContent);
+        const selAsignacion = document.getElementById('selectAsignacion');
+        if (!selAsignacion) return;
+
+        selAsignacion.addEventListener('change', () => {
+            window.location.href = '/profesor/calificaciones?id_curso_asig=' + encodeURIComponent(selAsignacion.value);
+        });
+
+        const filas = Array.from(document.querySelectorAll('.item-alumno-row'));
+
+        const leerNota = (input) => {
+            const crudo = input.value.toString().replace(',', '.').trim();
+            if (crudo === '') return { vacio: true, valor: null, valida: true };
+            const valor = parseFloat(crudo);
+            return { vacio: false, valor: valor, valida: !isNaN(valor) && valor >= 1 && valor <= 7 };
+        };
+
+        function recalcular(fila) {
+            let suma = 0;
+            let pesos = 0;
+            fila.querySelectorAll('.input-nota').forEach((input) => {
+                const n = leerNota(input);
+                input.classList.remove('text-rose-400', 'border-rose-500/60', 'text-teal-300');
+                if (n.vacio) return;
+                if (!n.valida) {
+                    input.classList.add('text-rose-400', 'border-rose-500/60');
+                    return;
+                }
+                const peso = parseFloat(input.getAttribute('data-peso')) || 0;
+                suma += n.valor * peso;
+                pesos += peso;
+                input.classList.add(n.valor < 4 ? 'text-rose-400' : 'text-teal-300');
+            });
+
+            const elem = fila.querySelector('.elem-promedio');
+            if (pesos > 0) {
+                const promedio = suma / pesos;
+                elem.textContent = promedio.toFixed(1);
+                elem.className = 'elem-promedio font-extrabold text-sm px-2.5 py-1 rounded-lg inline-block min-w-[50px] border ' +
+                    (promedio < 4 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40');
+            } else {
+                elem.textContent = '--';
+                elem.className = 'elem-promedio font-extrabold text-sm px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 inline-block min-w-[50px]';
+            }
+        }
+
+        filas.forEach((fila) => {
+            recalcular(fila);
+            fila.querySelectorAll('.input-nota').forEach((input) => input.addEventListener('input', () => recalcular(fila)));
+        });
+
+        const buscador = document.getElementById('inputBuscarAlumno');
+        buscador.addEventListener('input', () => {
+            const q = buscador.value.toLowerCase().trim();
+            filas.forEach((fila) => {
+                const coincide = fila.getAttribute('data-nombre').includes(q) || fila.getAttribute('data-rut').includes(q);
+                fila.style.display = coincide ? '' : 'none';
+            });
+        });
+
+        if (datos.destacado) {
+            const fila = filas.find((f) => f.getAttribute('data-id') === String(datos.destacado));
+            if (fila) fila.scrollIntoView({ block: 'center' });
+        }
+
+        const btnGuardar = document.getElementById('btnGuardarNotas');
+        let guardando = false;
+
+        btnGuardar.addEventListener('click', async () => {
+            if (guardando) return;
+
+            const notas = [];
+            const observaciones = [];
+            let invalida = null;
+
+            filas.forEach((fila) => {
+                const idEstudiante = Number(fila.getAttribute('data-id'));
+                let cambioNotas = false;
+
+                fila.querySelectorAll('.input-nota').forEach((input) => {
+                    const original = (input.getAttribute('data-original') || '').trim();
+                    const actual = input.value.toString().replace(',', '.').trim();
+                    const n = leerNota(input);
+                    if (!n.valida && !invalida) invalida = input;
+                    if (actual === original) return;
+                    cambioNotas = true;
+                    notas.push({ id_estudiante: idEstudiante, id_evaluacion: Number(input.getAttribute('data-evaluacion')), nota: actual === '' ? null : actual });
+                });
+
+                const inputObs = fila.querySelector('.input-observacion');
+                if (cambioNotas || inputObs.value.trim() !== (inputObs.getAttribute('data-original') || '').trim()) {
+                    observaciones.push({ id_estudiante: idEstudiante, observacion: inputObs.value.trim() });
+                }
+            });
+
+            if (invalida) {
+                invalida.focus();
+                Educare.notificar('error', 'Nota no válida', 'Las notas deben estar entre 1.0 y 7.0.');
+                return;
+            }
+            if (notas.length === 0 && observaciones.length === 0) {
+                Educare.notificar('info', 'Sin cambios', 'No hay calificaciones nuevas ni modificadas para guardar.');
+                return;
+            }
+
+            guardando = true;
+            btnGuardar.disabled = true;
+            btnGuardar.classList.add('opacity-60');
+            try {
+                const respuesta = await fetch('/profesor/calificaciones/guardar', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_curso_asig: datos.idCursoAsig, notas: notas, observaciones: observaciones })
+                });
+                const resultado = await respuesta.json().catch(() => ({}));
+                if (!respuesta.ok || !resultado.ok) throw new Error(resultado.error || 'No se pudieron guardar las calificaciones.');
+
+                filas.forEach((fila) => {
+                    fila.querySelectorAll('.input-nota').forEach((input) => input.setAttribute('data-original', input.value.toString().replace(',', '.').trim()));
+                    const obs = fila.querySelector('.input-observacion');
+                    obs.setAttribute('data-original', obs.value.trim());
+                });
+                Educare.notificar('success', 'Calificaciones guardadas', 'Los cambios quedaron registrados correctamente.');
+            } catch (error) {
+                Educare.notificar('error', 'No se pudo guardar', error.message);
+            } finally {
+                guardando = false;
+                btnGuardar.disabled = false;
+                btnGuardar.classList.remove('opacity-60');
+            }
+        });
+
+        const modal = document.getElementById('modalEvaluacion');
+        const cerrar = () => modal.classList.add('hidden');
+        document.querySelectorAll('#btnNuevaEvaluacion, [data-abrir-evaluacion]').forEach((b) => b.addEventListener('click', () => modal.classList.remove('hidden')));
+        document.querySelectorAll('[data-cerrar-evaluacion]').forEach((b) => b.addEventListener('click', cerrar));
+        modal.addEventListener('click', (e) => { if (e.target === modal) cerrar(); });
+
+        document.getElementById('formEvaluacion').addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            const boton = document.getElementById('btnCrearEvaluacion');
+            boton.disabled = true;
+            try {
+                const respuesta = await fetch('/profesor/calificaciones/evaluacion', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_curso_asig: datos.idCursoAsig,
+                        nombre: document.getElementById('evNombre').value,
+                        tipo: document.getElementById('evTipo').value,
+                        fecha: document.getElementById('evFecha').value,
+                        porcentaje: document.getElementById('evPorcentaje').value
+                    })
+                });
+                const resultado = await respuesta.json().catch(() => ({}));
+                if (!respuesta.ok || !resultado.ok) throw new Error(resultado.error || 'No se pudo crear la evaluación.');
+                window.location.reload();
+            } catch (error) {
+                boton.disabled = false;
+                Educare.notificar('error', 'No se pudo crear', error.message);
+            }
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

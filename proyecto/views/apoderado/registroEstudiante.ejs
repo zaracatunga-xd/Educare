@@ -1,0 +1,310 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-5xl mx-auto mb-4">
+    <a href="/apoderado" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-arrow-left"></i> Volver al Panel
+    </a>
+</div>
+
+    <!-- Contenedor Principal -->
+    <div class="max-w-5xl mx-auto bg-slate-900 p-6 md:p-8 rounded-2xl border border-slate-700 shadow-2xl">
+        
+        <!-- Bloque para mostrar errores de MySQL o validación en pantalla -->
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="bg-red-900/80 border border-red-500 text-red-200 p-4 rounded-xl mb-6 text-sm flex items-center gap-3 shadow-lg">
+                <span class="text-xl">⚠️</span>
+                <div>
+                    <strong>Atención:</strong> <%= error %>
+                </div>
+            </div>
+        <% } %>
+
+        <h2 class="text-2xl font-bold text-emerald-400 mb-1">Ingreso de Nuevo Pupilo y Ficha FUDEI</h2>
+        <p class="text-slate-400 text-sm mb-6">
+            Formulario Único de Evaluación Integral para la integración escolar (Decreto 170 / MINEDUC).
+        </p>
+
+        <!-- Pestañas de Navegación por Pasos -->
+        <div class="flex overflow-x-auto justify-between items-center mb-8 border-b border-slate-700 pb-4 gap-2">
+            <button type="button" onclick="cambiarPaso(1)" id="btn-paso-1" class="step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition whitespace-nowrap">
+                1. Estudiante
+            </button>
+            <button type="button" onclick="cambiarPaso(2)" id="btn-paso-2" class="step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition whitespace-nowrap">
+                2. Diagnóstico
+            </button>
+            <button type="button" onclick="cambiarPaso(3)" id="btn-paso-3" class="step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition whitespace-nowrap">
+                3. Sintesis
+            </button>
+            <button type="button" onclick="cambiarPaso(4)" id="btn-paso-4" class="step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition whitespace-nowrap">
+                4. Evaluadores
+            </button>
+            <button type="button" onclick="cambiarPaso(5)" id="btn-paso-5" class="step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition whitespace-nowrap">
+                5. Apoyos
+            </button>
+        </div>
+
+        <!-- FORMULARIO -->
+        <form action="/apoderado/agregar-pupilo" method="POST" id="formFudei" class="space-y-6">
+
+            <!-- PASO 1: DATOS DEL ESTUDIANTE Y CURSO -->
+            <div id="paso-1" class="paso-content space-y-4">
+                <h3 class="text-lg font-semibold text-emerald-300 border-b border-slate-700 pb-2">1. Identificación y Matrícula del Estudiante</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">RUT del Estudiante *</label>
+                        <input type="text" name="rut" placeholder="12345678-9" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Parentesco con Apoderado *</label>
+                        <select name="parentesco" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                            <option value="Madre">Madre</option>
+                            <option value="Padre">Padre</option>
+                            <option value="Tutor Legal">Tutor Legal</option>
+                            <option value="Abuelo/a">Abuelo/a</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Nombres *</label>
+                        <input type="text" name="nombre" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Apellidos *</label>
+                        <input type="text" name="apellido" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Fecha de Nacimiento *</label>
+                        <input type="date" data-date-rule="birth-student" name="fecha_nacimiento" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Género</label>
+                        <select name="genero" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                            <option value="Femenino">Femenino</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- CAMPO ASIGNAR CURSO CON VALIDACIÓN DE CUPO (LÍMITE 15 ALUMNOS) -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-amber-300 mb-1">Curso a Matricular (Límite 15 Alumnos por Curso) *</label>
+                        <select name="id_curso" required class="w-full bg-slate-900 border border-amber-500/50 rounded-lg p-2.5 text-sm text-slate-100 focus:border-amber-400 focus:outline-none">
+                            <option value="">-- Seleccione un Curso Disponible --</option>
+                            <% if (locals.cursos && cursos.length > 0) { %>
+                                <% cursos.forEach(function(c) { %>
+                                    <% const estaLleno = c.inscritos >= 15; %>
+                                    <option value="<%= c.id_curso %>" <%= estaLleno ? 'disabled class="text-rose-400 bg-slate-950"' : '' %>>
+                                        <%= c.nivel %> - Sección <%= c.seccion %> (<%= c.jornada %>) - <%= c.inscritos %>/15 alumnos <%= estaLleno ? '❌ [CURSO LLENO]' : '✅ [CUPO DISPONIBLE]' %>
+                                    </option>
+                                <% }); %>
+                            <% } else { %>
+                                <option value="" disabled>No hay cursos registrados en el sistema</option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: DIAGNÓSTICO Y FUDEI BASE -->
+            <div id="paso-2" class="paso-content hidden space-y-4">
+                <h3 class="text-lg font-semibold text-emerald-300 border-b border-slate-700 pb-2">2. Diagnóstico de Necesidad Educativa Especial (NEE)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs text-slate-300 mb-1">Diagnóstico Principal (Catálogo MINEDUC)</label>
+                        <select name="id_tipo_nee" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                            <% if (typeof tiposNee !== 'undefined' && tiposNee && tiposNee.length > 0) { %>
+                                <% tiposNee.forEach(t => { %>
+                                    <option value="<%= t.id_tipo_nee %>" >
+                                        [<%= t.clasificacion %>] <%= t.nombre %>
+                                    </option>
+                                <% }) %>
+                            <% } else { %>
+                                <option value="">No hay diagnósticos disponibles en el catálogo</option>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Fecha de Evaluación Integral</label>
+                        <input type="date" data-date-rule="past" name="fecha_evaluacion" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">Fecha de Vencimiento / Reevaluación</label>
+                        <input type="date" data-date-rule="after" data-date-after="fecha_evaluacion" name="fecha_vencimiento" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 3: SÍNTESIS MULTIDIMENSIONAL -->
+            <div id="paso-3" class="paso-content hidden space-y-4">
+                <h3 class="text-lg font-semibold text-emerald-300 border-b border-slate-700 pb-2">3. Síntesis Multidimensional de Evaluación</h3>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Síntesis de Salud</label>
+                    <textarea name="sintesis_salud" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Síntesis Psicoeducativa</label>
+                    <textarea name="sintesis_psicoeducativa" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Síntesis Escolar</label>
+                    <textarea name="sintesis_escolar" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Síntesis Social y Familiar</label>
+                    <textarea name="sintesis_social_familiar" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- PASO 4: EQUIPO EVALUADOR -->
+            <div id="paso-4" class="paso-content hidden space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                    <h3 class="text-lg font-semibold text-emerald-300">4. Equipo Evaluador Multidisciplinario</h3>
+                    <button type="button" onclick="agregarEvaluador()" class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg transition">+ Añadir Profesional</button>
+                </div>
+
+                <div id="contenedor-evaluadores" class="space-y-3">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Nombre Completo del Profesional</label>
+                            <input type="text" name="evaluador_nombre[]" placeholder="Ej: Carolina Martínez" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Rol / Especialidad</label>
+                            <input type="text" name="evaluador_rol[]" placeholder="Ej: Educadora Diferencial" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Registro SEC / MINSAL</label>
+                            <input type="text" name="evaluador_registro[]" placeholder="Ej: SEC-88431" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Fecha de Evaluación</label>
+                            <input type="date" data-date-rule="past" name="evaluador_fecha[]" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 5: PLAN DE APOYOS -->
+            <div id="paso-5" class="paso-content hidden space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                    <h3 class="text-lg font-semibold text-emerald-300">5. Planificación de Apoyos e Intervención</h3>
+                    <button type="button" onclick="agregarApoyo()" class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg transition">+ Añadir Apoyo</button>
+                </div>
+
+                <div id="contenedor-apoyos" class="space-y-3">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs text-slate-400 mb-1">Área de Apoyo</label>
+                                <input type="text" name="apoyo_area[]" placeholder="Ej: Adaptación Curricular" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Horas Semanales</label>
+                                <input type="number" step="0.5" name="apoyo_horas[]" value="2.0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Descripción de la Intervención</label>
+                            <textarea name="apoyo_descripcion[]" rows="2" placeholder="Detalle de las estrategias..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTONES DE NAVEGACIÓN COMPLETA -->
+            <div class="flex justify-between items-center pt-6 border-t border-slate-700">
+                <button type="button" id="btnAnterior" onclick="pasoAnterior()" class="hidden bg-slate-700 hover:bg-slate-600 text-white text-sm px-5 py-2.5 rounded-xl transition">
+                    ← Anterior
+                </button>
+                
+                <div class="flex-1"></div>
+
+                <button type="button" id="btnSiguiente" onclick="pasoSiguiente()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition shadow-lg">
+                    Siguiente →
+                </button>
+                
+                <button type="submit" id="btnGuardar" class="hidden bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm px-8 py-2.5 rounded-xl transition shadow-lg cursor-pointer">
+                    Guardar Pupilo y Registrar FUDEI
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Script de control de visibilidad y flujo -->
+    <script>
+        let pasoActual = 1;
+
+        function cambiarPaso(nuevoPaso) {
+            document.getElementById(`paso-${pasoActual}`).classList.add('hidden');
+            document.getElementById(`btn-paso-${pasoActual}`).className = "step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition whitespace-nowrap";
+
+            pasoActual = nuevoPaso;
+
+            document.getElementById(`paso-${pasoActual}`).classList.remove('hidden');
+            document.getElementById(`btn-paso-${pasoActual}`).className = "step-btn px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition whitespace-nowrap";
+
+            document.getElementById('btnAnterior').classList.toggle('hidden', pasoActual === 1);
+            document.getElementById('btnSiguiente').classList.toggle('hidden', pasoActual === 5);
+            document.getElementById('btnGuardar').classList.toggle('hidden', pasoActual !== 5);
+        }
+
+        function pasoSiguiente() {
+            if (pasoActual < 5) cambiarPaso(pasoActual + 1);
+        }
+
+        function pasoAnterior() {
+            if (pasoActual > 1) cambiarPaso(pasoActual - 1);
+        }
+
+        function agregarEvaluador() {
+            const div = document.createElement('div');
+            div.className = "bg-slate-900 p-4 rounded-xl border border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-3";
+            div.innerHTML = `
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Nombre Completo del Profesional</label>
+                    <input type="text" name="evaluador_nombre[]" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Rol / Especialidad</label>
+                    <input type="text" name="evaluador_rol[]" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Registro SEC / MINSAL</label>
+                    <input type="text" name="evaluador_registro[]" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Fecha de Evaluación</label>
+                    <input type="date" data-date-rule="past" name="evaluador_fecha[]" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                </div>
+            `;
+            document.getElementById('contenedor-evaluadores').appendChild(div);
+        }
+
+        function agregarApoyo() {
+            const div = document.createElement('div');
+            div.className = "bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3";
+            div.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs text-slate-400 mb-1">Área de Apoyo</label>
+                        <input type="text" name="apoyo_area[]" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Horas Semanales</label>
+                        <input type="number" step="0.5" name="apoyo_horas[]" value="1.0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Descripción de la Intervención</label>
+                    <textarea name="apoyo_descripcion[]" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100 focus:outline-none"></textarea>
+                </div>
+            `;
+            document.getElementById('contenedor-apoyos').appendChild(div);
+        }
+    </script>
+<%- include('../partials/footer') %>

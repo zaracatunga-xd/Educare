@@ -1,0 +1,23 @@
+<%
+    const _su = (typeof sessionUser !== 'undefined' && sessionUser) ? sessionUser : ((typeof user !== 'undefined' && user) ? user : null);
+    const _rol = _su ? String(_su.rol || '').toLowerCase().trim() : '';
+    const _ruta = (typeof currentPath !== 'undefined' && currentPath) ? currentPath : '';
+    const conSidebar = !!_su && ['administrador', 'admin', 'profesor', 'docente', 'profesor jefe', 'apoderado'].indexOf(_rol) !== -1 && ['/', '/login', '/register'].indexOf(_ruta) === -1;
+%>
+<% if (conSidebar) { %>
+        </main>
+        <footer class="app-footer">
+            Escuela Diferencial Educare &middot; Prototipo de Comunicación e Integración PIE &middot; Diseño accesible, intuitivo e inclusivo
+        </footer>
+    </div>
+</div>
+<% } else { %>
+    </main>
+    <footer class="pub-foot">
+        <p style="font-weight:600">Escuela Diferencial Educare - Prototipo de Comunicación e Integración PIE</p>
+        <p>Diseño accesible, intuitivo e inclusivo adaptado para la educación especial.</p>
+    </footer>
+</div>
+<% } %>
+</body>
+</html>

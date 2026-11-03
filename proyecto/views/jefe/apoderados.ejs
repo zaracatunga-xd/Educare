@@ -1,0 +1,63 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto space-y-5 pb-8">
+<% if (vacio) { %>
+    <%- include('_vacio') %>
+<% } else { %>
+    <%- include('_nav') %>
+
+    <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-people-roof text-amber-400"></i> Apoderados del curso (<%= apoderados.length %>)</h2>
+        <input type="text" id="buscarApoderado" placeholder="Buscar apoderado o pupilo..." class="bg-slate-800 border border-slate-700 text-white text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-400">
+    </div>
+
+    <% if (apoderados.length === 0) { %>
+        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-8 text-center text-xs text-slate-400">No hay apoderados vinculados a los estudiantes de este curso.</div>
+    <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="listaApoderados">
+            <% apoderados.forEach((a) => { %>
+                <div class="tarjeta-apoderado bg-slate-900/90 rounded-2xl border border-slate-800 shadow-lg p-5 space-y-3"
+                     data-busqueda="<%= (a.nombre_completo + ' ' + a.pupilos.map((p) => p.nombre).join(' ')).toLowerCase() %>">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-sm flex items-center justify-center shrink-0"><%= a.nombre_completo.split(' ').map((p) => p.charAt(0)).slice(0, 2).join('') %></div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-white truncate"><%= a.nombre_completo %></p>
+                            <p class="text-[11px] text-slate-400">RUT <%= a.rut %></p>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1">
+                        <li><i class="fa-solid fa-envelope w-4 text-slate-500"></i> <%= a.correo || 'Sin correo registrado' %></li>
+                        <li><i class="fa-solid fa-phone w-4 text-slate-500"></i> <%= a.telefono || 'Sin teléfono' %></li>
+                    </ul>
+                    <div class="pt-3 border-t border-slate-800 space-y-1.5">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pupilos en este curso</p>
+                        <% a.pupilos.forEach((p) => { %>
+                            <a href="/jefe/estudiante/<%= p.id_estudiante %>?curso=<%= curso.id_curso_periodo %>" class="flex items-center justify-between text-xs text-slate-100 hover:text-amber-300">
+                                <span><i class="fa-solid fa-user-graduate text-teal-400 mr-1.5"></i><%= p.nombre %></span>
+                                <span class="text-[10px] text-slate-400"><%= p.parentesco || '' %></span>
+                            </a>
+                        <% }) %>
+                    </div>
+                    <a href="/profesor/atencionApo?estudiante=<%= a.pupilos[0].id_estudiante %>" class="w-full py-2 rounded-xl text-xs font-bold bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white border border-sky-500/30 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-comments"></i> Enviar mensaje
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+<% } %>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const buscador = document.getElementById('buscarApoderado');
+        if (!buscador) return;
+        buscador.addEventListener('input', () => {
+            const q = buscador.value.toLowerCase().trim();
+            document.querySelectorAll('.tarjeta-apoderado').forEach((t) => {
+                t.style.display = t.getAttribute('data-busqueda').includes(q) ? '' : 'none';
+            });
+        });
+    });
+</script>
+<%- include('../partials/footer') %>

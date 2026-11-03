@@ -1,0 +1,376 @@
+<%- include('partials/header') %>
+
+<!-- 1. HERO SECTION: Único entorno de gestión, comunicación y seguimiento -->
+<section class="relative overflow-hidden py-12 md:py-20 bg-slate-950/40">
+    <!-- Efecto Glow de fondo -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-teal-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Encabezado y Propuesta de Valor -->
+            <div class="space-y-6 text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-sparkles text-xs"></i> Entorno Único para Educación Especial
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
+                    Gestión, Comunicación y <br class="hidden sm:inline" />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400">Seguimiento Integral</span>
+                </h1>
+
+                <p class="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
+                    <strong>Educare</strong> conecta en tiempo real a docentes, especialistas, directivos y familias en un ecosistema digital seguro, diseñado específicamente para acompañar las Necesidades Educativas Especiales (NEE).
+                </p>
+
+                <!-- Botones Principales de Entrada -->
+                <div class="pt-2 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="/login" class="px-7 py-3.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-teal-500/20 transition-all hover:scale-105 flex items-center justify-center gap-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-right-to-bracket text-base"></i> Acceder a la Plataforma
+                    </a>
+                    <a href="/register" class="px-7 py-3.5 bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 transition-all hover:scale-105 flex items-center justify-center gap-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-user-plus text-base"></i> Solicitud de Registro
+                    </a>
+                </div>
+
+                <!-- Garantías de usabilidad -->
+                <div class="pt-4 flex flex-wrap justify-center lg:justify-start gap-6 text-xs text-slate-400 font-medium">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-teal-400"></i> Acceso 100% Seguro</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-teal-400"></i> Adaptado a la Escuela</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-teal-400"></i> Comunicación Directa</span>
+                </div>
+            </div>
+
+            <!-- Imagen Principal estilo Alexia -->
+            <div class="relative">
+                <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 opacity-20 blur-xl"></div>
+                <div class="relative rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 dark-island">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Plataforma Educare - Escuela Especial" 
+                         class="w-full h-[380px] sm:h-[440px] object-cover hover:scale-105 transition duration-500">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex flex-col justify-end p-6">
+                        <div class="flex items-center gap-2 text-teal-400 text-xs font-bold uppercase tracking-wide mb-1">
+                            <i class="fa-solid fa-shield-halved"></i> Ecosistema Protegido por Roles
+                        </div>
+                        <p class="text-xs text-slate-300 font-medium">
+                            Cada usuario (administrador, docente, apoderado o alumno) accede a un panel optimizado para sus necesidades específicas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 2. CINTA DE MÉTRICAS Y VALOR -->
+<section class="bg-slate-900/90 border-y border-slate-800/80 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div class="flex items-center gap-4 p-3 bg-slate-800/40 rounded-2xl border border-slate-800">
+                <div class="w-12 h-12 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center text-xl shrink-0 border border-teal-500/20">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm">Entorno Único</h4>
+                    <p class="text-xs text-slate-400">Centraliza calificaciones y datos</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 p-3 bg-slate-800/40 rounded-2xl border border-slate-800">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl shrink-0 border border-emerald-500/20">
+                    <i class="fa-solid fa-hands-holding-child"></i>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm">Acompañamiento</h4>
+                    <p class="text-xs text-slate-400">Seguimiento paso a paso</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 p-3 bg-slate-800/40 rounded-2xl border border-slate-800">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl shrink-0 border border-cyan-500/20">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm">Comunicación 360°</h4>
+                    <p class="text-xs text-slate-400">Avisos y citaciones en vivo</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 p-3 bg-slate-800/40 rounded-2xl border border-slate-800">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl shrink-0 border border-amber-500/20">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm">Privacidad Total</h4>
+                    <p class="text-xs text-slate-400">Control de permisos por rol</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 3. SOLUCIONES PENSADAS POR CADA TIPO DE USUARIO -->
+<section class="py-16 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <span class="text-teal-400 text-xs font-bold uppercase tracking-widest bg-teal-500/10 px-3.5 py-1.5 rounded-full border border-teal-500/20">
+                Soluciones por Perfil
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                Una experiencia diseñada para cada integrante
+            </h2>
+            <p class="text-sm sm:text-base text-slate-400 mt-3">
+                Educare adapta sus herramientas para simplificar los procesos de toda la comunidad escolar.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Perfil: Apoderados -->
+            <div class="bg-slate-800/90 border border-slate-700/80 p-6 rounded-2xl shadow-xl hover:border-teal-500/50 transition duration-300 flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl mb-4 border border-rose-500/30 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-people-roof"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-rose-400 uppercase tracking-wider bg-rose-500/10 px-2 py-0.5 rounded-md">Para Apoderados</span>
+                    <h3 class="text-lg font-bold text-white mt-2 mb-2">Tranquilidad & Cercanía</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Revisa calificaciones, registros de asistencia diarios, notas del cuaderno de enlace y publicaciones de la escuela en un solo lugar.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center gap-2 text-xs text-teal-400 font-semibold">
+                    <i class="fa-solid fa-check text-xs"></i> Acceso a todos tus pupilos
+                </div>
+            </div>
+
+            <!-- Perfil: Docentes -->
+            <div class="bg-slate-800/90 border border-slate-700/80 p-6 rounded-2xl shadow-xl hover:border-teal-500/50 transition duration-300 flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl mb-4 border border-teal-500/30 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-teal-400 uppercase tracking-wider bg-teal-500/10 px-2 py-0.5 rounded-md">Para Profesorado</span>
+                    <h3 class="text-lg font-bold text-white mt-2 mb-2">Gestión Pedagógica Ágil</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Registra notas, califica evaluaciones adaptadas, pasa asistencia por clase y publica avisos institucionales para los cursos.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center gap-2 text-xs text-teal-400 font-semibold">
+                    <i class="fa-solid fa-check text-xs"></i> Cuaderno docente integrado
+                </div>
+            </div>
+
+            <!-- Perfil: Estudiantes -->
+            <div class="bg-slate-800/90 border border-slate-700/80 p-6 rounded-2xl shadow-xl hover:border-teal-500/50 transition duration-300 flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl mb-4 border border-blue-500/30 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded-md">Para Estudiantes</span>
+                    <h3 class="text-lg font-bold text-white mt-2 mb-2">Mi Progreso Escolar</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Visualiza promedios por asignatura, consulta el calendario de evaluaciones y mantente informado de los eventos de tu curso.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center gap-2 text-xs text-teal-400 font-semibold">
+                    <i class="fa-solid fa-check text-xs"></i> Interfaz amigable y clara
+                </div>
+            </div>
+
+            <!-- Perfil: Administración -->
+            <div class="bg-slate-800/90 border border-slate-700/80 p-6 rounded-2xl shadow-xl hover:border-teal-500/50 transition duration-300 flex flex-col justify-between group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4 border border-amber-500/30 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded-md">Para Administración</span>
+                    <h3 class="text-lg font-bold text-white mt-2 mb-2">Control Institucional</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Crea cursos, administra matrículas, asigna asignaturas a docentes y supervisa la seguridad general de la base de datos.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center gap-2 text-xs text-teal-400 font-semibold">
+                    <i class="fa-solid fa-check text-xs"></i> Auditoría y trazabilidad
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- 4. MÓDULOS CLAVE DE LA PLATAFORMA -->
+<section class="py-16 bg-slate-900/60 border-y border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+                <span class="text-teal-400 text-xs font-bold uppercase tracking-widest bg-teal-500/10 px-3.5 py-1.5 rounded-full border border-teal-500/20">
+                    Módulos Integrados
+                </span>
+                <h2 class="text-3xl font-extrabold text-white mt-3">Procesos clave en un mismo lugar</h2>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 max-w-md">
+                Evita herramientas aisladas o planillas dispersas. Educare sincroniza la información en una base de datos única.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div class="p-6 bg-slate-800/70 border border-slate-700/60 rounded-2xl">
+                <div class="w-10 h-10 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <h4 class="font-bold text-white text-base mb-2">Estructura Académica</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Organización de niveles, cursos, asignaturas y vinculación de profesores responsables por materia.
+                </p>
+            </div>
+
+            <div class="p-6 bg-slate-800/70 border border-slate-700/60 rounded-2xl">
+                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <h4 class="font-bold text-white text-base mb-2">Evaluación y Calificaciones</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Creación de instancias de evaluación, ponderaciones, cálculo de promedios e historial académico por estudiante.
+                </p>
+            </div>
+
+            <div class="p-6 bg-slate-800/70 border border-slate-700/60 rounded-2xl">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <h4 class="font-bold text-white text-base mb-2">Asistencia y Observaciones</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Registro de estados (Presente, Ausente, Justificado) con la opción de incorporar anotaciones específicas de cada jornada.
+                </p>
+            </div>
+
+            <div class="p-6 bg-slate-800/70 border border-slate-700/60 rounded-2xl">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <h4 class="font-bold text-white text-base mb-2">Muro de Comunicaciones</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Publicación de avisos dirigidos a cursos específicos para mantener informada a la familia sobre eventos y citaciones.
+                </p>
+            </div>
+
+            <div class="p-6 bg-slate-800/70 border border-slate-700/60 rounded-2xl">
+                <div class="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-address-card"></i>
+                </div>
+                <h4 class="font-bold text-white text-base mb-2">Matrículas y Apoderados</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Gestión de relaciones apoderado-estudiante para permitir la consulta segura de uno o más pupilos.
+                </p>
+            </div>
+
+            <div class="p-6 bg-slate-800/70 border border-slate-700/60 rounded-2xl">
+                <div class="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg mb-3">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h4 class="font-bold text-white text-base mb-2">Seguridad y Auditoría</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Autenticación por roles con contraseñas encriptadas y trazabilidad de cambios en la base de datos.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- 5. PREGUNTAS FRECUENTES (FAQ ESTILO ALEXIA) -->
+<section class="py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center mb-12">
+            <span class="text-teal-400 text-xs font-bold uppercase tracking-widest bg-teal-500/10 px-3.5 py-1.5 rounded-full border border-teal-500/20">
+                Resuelve tus Dudas
+            </span>
+            <h2 class="text-3xl font-extrabold text-white mt-3">Preguntas Frecuentes sobre Educare</h2>
+        </div>
+
+        <div class="space-y-4">
+            
+            <details class="group bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 [&_summary::-webkit-details-marker]:hidden cursor-pointer">
+                <summary class="flex items-center justify-between gap-4 font-bold text-white text-sm">
+                    <span>¿Qué aporta Educare a nuestra Escuela Especial?</span>
+                    <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-teal-400 group-open:rotate-180 transition shrink-0">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </span>
+                </summary>
+                <p class="text-xs text-slate-300 leading-relaxed mt-3 pt-3 border-t border-slate-700/50">
+                    Educare unifica la gestión académica y el seguimiento continuo. Permite a los profesores registrar calificaciones, asistencia y observaciones, mientras los apoderados acceden a la información de sus pupilos en tiempo real de forma ordenada y confidencial.
+                </p>
+            </details>
+
+            <details class="group bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 [&_summary::-webkit-details-marker]:hidden cursor-pointer">
+                <summary class="flex items-center justify-between gap-4 font-bold text-white text-sm">
+                    <span>¿Cómo acceden los apoderados y docentes?</span>
+                    <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-teal-400 group-open:rotate-180 transition shrink-0">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </span>
+                </summary>
+                <p class="text-xs text-slate-300 leading-relaxed mt-3 pt-3 border-t border-slate-700/50">
+                    Cada usuario cuenta con credenciales únicas. Al iniciar sesión, el sistema identifica su rol (Administrador, Profesor, Estudiante o Apoderado) y habilita únicamente los menús y funciones que le corresponden.
+                </p>
+            </details>
+
+            <details class="group bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 [&_summary::-webkit-details-marker]:hidden cursor-pointer">
+                <summary class="flex items-center justify-between gap-4 font-bold text-white text-sm">
+                    <span>¿Un apoderado puede revisar a más de un estudiante?</span>
+                    <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-teal-400 group-open:rotate-180 transition shrink-0">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </span>
+                </summary>
+                <p class="text-xs text-slate-300 leading-relaxed mt-3 pt-3 border-t border-slate-700/50">
+                    Sí. El módulo de asociación permite vincular múltiples pupilos a una misma cuenta de apoderado para cambiar entre ellos fácilmente dentro de su panel personal.
+                </p>
+            </details>
+
+            <details class="group bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 [&_summary::-webkit-details-marker]:hidden cursor-pointer">
+                <summary class="flex items-center justify-between gap-4 font-bold text-white text-sm">
+                    <span>¿Cómo solicito el registro en el sistema?</span>
+                    <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-teal-400 group-open:rotate-180 transition shrink-0">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </span>
+                </summary>
+                <p class="text-xs text-slate-300 leading-relaxed mt-3 pt-3 border-t border-slate-700/50">
+                    Puedes ingresar al botón <strong>"Solicitud de Registro"</strong> en el menú superior o en la portada. Completa el formulario seleccionando tu tipo de usuario y el equipo administrativo validará tu perfil.
+                </p>
+            </details>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- 6. BANNER CTA FINAL DE BIENVENIDA -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-gradient-to-r from-teal-950 via-slate-900 to-slate-900 border border-teal-500/40 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden shadow-2xl">
+        <div class="max-w-2xl mx-auto space-y-4">
+            <h2 class="text-3xl font-extrabold text-white">¿Listo para ingresar a Educare?</h2>
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                Forma parte del entorno digital unificado de nuestra escuela diferencial. Accede con tus credenciales o solicita tu cuenta.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-4 justify-center">
+                <a href="/login" class="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl shadow-lg transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </a>
+                <a href="/register" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> Solicitar Registro
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

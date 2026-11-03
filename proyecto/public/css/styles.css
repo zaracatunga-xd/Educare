@@ -1,0 +1,144 @@
+body {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid #288e46;
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   1. MODO CLARO (Predeterminado: Blanco + Verde)
+   ========================================== */
+html:not([data-theme='dark']),
+html[data-theme='light'] {
+    --bg-main: #ffffff;
+    --bg-header: #3f9962;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --border-color: #e2e8f0;
+    --text-title: #0f172a;
+    --text-muted: #64748b;
+    --accent-green: #288852;
+}
+
+/* Fondo principal y textos en modo claro */
+html:not([data-theme='dark']) body,
+html[data-theme='light'] body {
+    background-color: #efeded !important;
+    color: #0f172a !important;
+}
+
+/* Tarjetas y contenedores blancos */
+html:not([data-theme='dark']) .bg-white,
+html[data-theme='light'] .bg-white {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+/* Encabezado Verde Educare */
+html:not([data-theme='dark']) header,
+html[data-theme='light'] header {
+    background-color: #0f4c47 !important;
+    color: #ffffff !important;
+}
+
+/* Inputs en modo claro */
+html:not([data-theme='dark']) input,
+html:not([data-theme='dark']) select,
+html:not([data-theme='dark']) textarea,
+html[data-theme='light'] input,
+html[data-theme='light'] select,
+html[data-theme='light'] textarea {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+/* ==========================================
+   2. MODO OSCURO (#111923 + Verde Neón)
+   ========================================== */
+html[data-theme='dark'] {
+    --bg-main: #111923;
+    --bg-header: #0f4c47;
+    --bg-card: #1c2635;
+    --bg-input: #283548;
+    --border-input: #3b4d66;
+    --text-title: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent-green: #4ade80;
+}
+
+/* Fondo principal oscuro */
+html[data-theme='dark'] body {
+    background-color: #111923 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Tarjetas, contenedores y menú desplegable oscuros */
+html[data-theme='dark'] .bg-white,
+html[data-theme='dark'] .bg-slate-50,
+html[data-theme='dark'] .bg-slate-100,
+html[data-theme='dark'] .bg-slate-800,
+html[data-theme='dark'] .bg-slate-900 {
+    background-color: #1c2635 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Estados hover de los botones del menú desplegable en modo oscuro */
+html[data-theme='dark'] .hover\:bg-slate-50:hover {
+    background-color: #283548 !important;
+}
+
+html[data-theme='dark'] .hover\:bg-red-50:hover {
+    background-color: #3b1d28 !important;
+}
+
+/* Encabezados y barras en modo oscuro */
+html[data-theme='dark'] header,
+html[data-theme='dark'] nav {
+    background-color: #0f4c47 !important;
+}
+
+/* Inputs en modo oscuro */
+html[data-theme='dark'] input,
+html[data-theme='dark'] select,
+html[data-theme='dark'] textarea {
+    background-color: #283548 !important;
+    border-color: #3b4d66 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Adaptación de textos claros para lectura en fondo oscuro */
+html[data-theme='dark'] .text-slate-900,
+html[data-theme='dark'] .text-slate-800,
+html[data-theme='dark'] .text-slate-700,
+html[data-theme='dark'] .text-slate-600 {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='dark'] .text-slate-500,
+html[data-theme='dark'] .text-slate-400 {
+    color: #94a3b8 !important;
+}
+
+/* Bordes en modo oscuro */
+html[data-theme='dark'] .border-slate-100,
+html[data-theme='dark'] .border-slate-200,
+html[data-theme='dark'] .divide-slate-200 > * {
+    border-color: #3b4d66 !important;
+}
+
+/* ==========================================
+   3. EFECTOS Y SEMÁFOROS
+   ========================================== */
+.traffic-light-glow-green {
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+}
+.traffic-light-glow-yellow {
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.6);
+}
+.traffic-light-glow-red {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+}

@@ -1,0 +1,15 @@
+<div class="max-w-3xl mx-auto bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-10 text-center space-y-3">
+    <div class="w-16 h-16 mx-auto rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl">
+        <i class="fa-solid fa-user-tie"></i>
+    </div>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <h2 class="text-base font-bold text-white">No se pudo cargar la jefatura</h2>
+        <p class="text-xs text-rose-300"><%= error %></p>
+    <% } else { %>
+        <h2 class="text-base font-bold text-white">Aún no tienes un curso asignado como profesor jefe</h2>
+        <p class="text-xs text-slate-400">Solicita al administrador que te asigne una jefatura desde Gestión de Cursos.</p>
+    <% } %>
+    <a href="/profesor" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition">
+        <i class="fa-solid fa-chalkboard-user"></i> Ir a mis clases
+    </a>
+</div>

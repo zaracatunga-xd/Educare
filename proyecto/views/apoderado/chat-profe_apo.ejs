@@ -1,0 +1,146 @@
+<%- include('../partials/header') %>
+
+<div class="h-[calc(100vh-8rem)] flex flex-col space-y-4">
+    <div class="flex items-center justify-between bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex items-center gap-3">
+            <a href="/apoderado" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition" title="Volver al Panel">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Chat Docente</h1>
+                <p class="text-xs text-slate-500">Contacto directo con los profesores de sus pupilos</p>
+            </div>
+        </div>
+        <span class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full border border-emerald-200">
+            <i class="fa-solid fa-lock text-[10px] mr-1"></i> Comunicación Segura
+        </span>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span><%= error %></span>
+        </div>
+    <% } %>
+
+    <div class="flex-1 min-h-0 bg-slate-900 rounded-2xl shadow-lg border border-slate-800 overflow-hidden grid grid-cols-1 md:grid-cols-12 dark-island">
+
+        <!-- LISTA DE DOCENTES -->
+        <div class="md:col-span-4 border-r border-slate-800 bg-slate-950/80 flex flex-col h-full min-h-0">
+            <div class="p-3 border-b border-slate-800">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="searchDocente" placeholder="Buscar profesor o asignatura..."
+                           class="w-full pl-9 pr-3 py-2 bg-slate-900 text-slate-200 placeholder-slate-500 text-xs rounded-xl border border-slate-800 focus:outline-none focus:border-teal-500 transition">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto divide-y divide-slate-800/50" id="docentesList">
+                <% if (profesores.length > 0) { %>
+                    <% profesores.forEach((prof) => { %>
+                        <div data-id-usuario="<%= prof.id_usuario_profesor %>"
+                             data-nombre-completo="Prof. <%= prof.prof_nombre %> <%= prof.prof_apellido %>"
+                             data-iniciales="<%= prof.prof_nombre.charAt(0) %><%= prof.prof_apellido.charAt(0) %>"
+                             data-asignaturas="<%= prof.asignaturas || '' %>"
+                             data-hijos="<%= prof.hijos || '' %>"
+                             data-busqueda="<%= (prof.prof_nombre + ' ' + prof.prof_apellido + ' ' + (prof.asignaturas || '') + ' ' + (prof.hijos || '')).toLowerCase() %>"
+                             class="docente-item w-full p-3.5 text-left hover:bg-slate-900 transition flex items-center gap-3 cursor-pointer">
+
+                            <div class="w-11 h-11 rounded-full bg-teal-600/20 border border-teal-500/30 text-teal-400 font-bold text-sm flex items-center justify-center shrink-0">
+                                <%= prof.prof_nombre.charAt(0) %><%= prof.prof_apellido.charAt(0) %>
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-2 mb-0.5">
+                                    <p class="text-xs font-bold text-slate-200 truncate">Prof. <%= prof.prof_nombre %> <%= prof.prof_apellido %></p>
+                                    <span data-hora class="text-[10px] text-slate-500 shrink-0"></span>
+                                </div>
+                                <p class="text-[11px] font-medium text-teal-400 truncate"><%= prof.asignaturas %></p>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p data-ultimo class="text-[10px] text-slate-400 truncate">Sin mensajes</p>
+                                    <span data-insignia class="hidden min-w-[16px] h-4 px-1 rounded-full bg-teal-500 text-slate-950 font-black text-[9px] flex items-center justify-center shrink-0"></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="p-6 text-center text-slate-500 space-y-2">
+                        <i class="fa-solid fa-user-slash text-2xl text-slate-600"></i>
+                        <p class="text-xs">No hay profesores asignados a tus pupilos inscritos.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- CONVERSACIÓN -->
+        <div class="md:col-span-8 flex flex-col h-full min-h-0 bg-slate-900">
+            <% if (profesores.length > 0) { %>
+
+                <div class="p-3.5 px-6 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="activeAvatar" class="w-10 h-10 rounded-full bg-teal-600/30 border border-teal-500/50 text-teal-300 font-bold text-sm flex items-center justify-center"></div>
+                        <div class="min-w-0">
+                            <h2 id="activeName" class="text-sm font-bold text-white"></h2>
+                            <p id="activeSub" class="text-[11px] text-slate-400 truncate"></p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] bg-slate-800 text-slate-300">
+                        <i class="fa-solid fa-lock text-[8px] text-teal-400"></i> Conversación privada
+                    </span>
+                </div>
+
+                <div id="chatMessages" class="flex-1 min-h-0 p-6 overflow-y-auto space-y-4 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+                <form id="chatForm" class="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center gap-2" autocomplete="off">
+                    <input type="text" id="messageInput" placeholder="Escribe un mensaje aquí..." maxlength="1000" required
+                           class="flex-1 bg-slate-900 text-slate-100 text-xs px-4 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-teal-500 transition placeholder-slate-500">
+                    <button type="submit" class="p-2.5 px-4 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-md disabled:opacity-60">
+                        <span>Enviar</span>
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </form>
+
+            <% } else { %>
+                <div class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8 space-y-3 text-center">
+                    <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-2xl text-slate-600">
+                        <i class="fa-comments fa-regular"></i>
+                    </div>
+                    <p class="text-sm font-medium">No hay canal de comunicación disponible.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script src="/js/chat.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const buscador = document.getElementById('searchDocente');
+        if (buscador) {
+            buscador.addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase().trim();
+                document.querySelectorAll('.docente-item').forEach((item) => {
+                    item.style.display = (item.getAttribute('data-busqueda') || '').includes(q) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        if (window.ChatCliente) {
+            ChatCliente.iniciar({
+                contenedorId: 'chatMessages',
+                formId: 'chatForm',
+                inputId: 'messageInput',
+                itemSelector: '.docente-item',
+                claseActiva: ['bg-slate-900', 'border-l-4', 'border-teal-500'],
+                alSeleccionar: (item) => {
+                    document.getElementById('activeName').textContent = item.getAttribute('data-nombre-completo');
+                    document.getElementById('activeAvatar').textContent = item.getAttribute('data-iniciales');
+                    document.getElementById('activeSub').textContent =
+                        item.getAttribute('data-asignaturas') + ' • Pupilo: ' + item.getAttribute('data-hijos');
+                }
+            });
+        }
+    });
+</script>
+
+<%- include('../partials/footer') %>

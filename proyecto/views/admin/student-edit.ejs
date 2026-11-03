@@ -1,0 +1,88 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-3xl mx-auto space-y-6 p-4">
+
+    <!-- Botón Volver -->
+    <div>
+        <a href="/admin/students" class="inline-flex items-center gap-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-700/80 transition-all shadow-md">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver a la lista de estudiantes</span>
+        </a>
+    </div>
+
+    <!-- Tarjeta del Formulario de Edición -->
+    <div class="bg-slate-800/80 rounded-2xl border border-slate-700/60 p-6 shadow-xl text-slate-200">
+        <div class="flex items-center gap-3 border-b border-slate-700/80 pb-4 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-user-pen"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-white">Editar Estudiante</h2>
+                <p class="text-xs text-slate-400">Modifica la información personal del alumno</p>
+            </div>
+        </div>
+
+        <% if (locals.error) { %>
+            <div class="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-xl text-sm mb-6">
+                <i class="fa-solid fa-circle-exclamation mr-2"></i> <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/admin/student-edit/<%= student.id_estudiante || student.id_persona %>" method="POST" class="space-y-4">
+            <input type="hidden" name="id_persona" value="<%= student.id_persona %>">
+            <input type="hidden" name="id_estudiante" value="<%= student.id_estudiante %>">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- RUT -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">RUT</label>
+                    <input type="text" name="rut" value="<%= student.rut %>" required 
+                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                </div>
+
+                <!-- Nombre -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nombre</label>
+                    <input type="text" name="nombre" value="<%= student.nombre %>" required 
+                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                </div>
+
+                <!-- Apellido -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Apellido</label>
+                    <input type="text" name="apellido" value="<%= student.apellido %>" required 
+                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                </div>
+
+                <!-- Fecha de Nacimiento -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Fecha de Nacimiento</label>
+                    <input type="date" data-date-rule="birth-student" name="fecha_nacimiento" value="<%= student.fecha_nacimiento || '' %>" 
+                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                </div>
+
+                <!-- Género -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Género</label>
+                    <select name="genero" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <option value="M" <%= student.genero === 'M' || student.genero === 'Masculino' ? 'selected' : '' %>>Masculino</option>
+                        <option value="F" <%= student.genero === 'F' || student.genero === 'Femenino' ? 'selected' : '' %>>Femenino</option>
+                        <option value="Otro" <%= student.genero === 'Otro' ? 'selected' : '' %>>Otro</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="pt-4 flex justify-end gap-3 border-t border-slate-700/80 mt-6">
+                <a href="/admin/students" class="px-5 py-2.5 rounded-xl border border-slate-600 text-slate-300 hover:bg-slate-700 text-sm font-semibold transition">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold shadow-md transition">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
